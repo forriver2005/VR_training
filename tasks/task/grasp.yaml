@@ -12,6 +12,7 @@ env:
   episodeLength: 50
   randomEpisodeLength: False
   enableDebugVis: False
+  enableCameraSensors: False
   aggregateMode: 1
   useRobotVhacd: False # detailed hand-arm shapes, but slow
   useObjectVhacd: True # should be true

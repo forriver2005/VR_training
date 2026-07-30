@@ -111,8 +111,13 @@ def collect_real_dataset(cfg, env):
         image_shape=(*env.render_cfg["resize"], 3),
         fps=round(1/env.dt/env.decimation),
     )
+    dataset_writer.write_collection_metadata({
+        "scene_manifest_version": 1,
+        "config": OmegaConf.to_container(cfg, resolve=True),
+    })
 
     n_saved_episodes = 0
+    collection_batch = 0
     while True:
         if n_saved_episodes >= NUM_EPISODES:
             break
@@ -122,6 +127,7 @@ def collect_real_dataset(cfg, env):
             with torch.no_grad():
                 plan = policy(obs, inference=True)
                 env.generate_reaching_plan_idx(torch.arange(env.num_envs), actions=plan)
+        scene_states = env.capture_scene_states(torch.arange(env.num_envs))
 
         episode_data_buffer = []
         for t in range(env.max_episode_length):
@@ -141,10 +147,18 @@ def collect_real_dataset(cfg, env):
                     episode_end = (t == len(episode_data_buffer)-1)
                     dataset_writer.append_step(
                         {k: v[env_id:env_id+1] for k, v in episode_data_buffer[t].items()},
-                        episode_end=episode_end
+                        episode_end=episode_end,
+                        episode_metadata={
+                            **scene_states[env_id],
+                            "collection_batch": collection_batch,
+                            "source_env_index": env_id,
+                            "expert_plan": plan[env_id].detach().cpu().tolist()
+                            if PLAY_POLICY else None,
+                        } if episode_end else None,
                     )
                 n_saved_episodes += 1
                 print(f"Saved episode {n_saved_episodes} from env {env_id}")
+        collection_batch += 1
 
 
 @hydra.main(version_base="1.3", config_path="./tasks", config_name="config")

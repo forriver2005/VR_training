@@ -52,9 +52,19 @@ DemoGrasp/
 
 - Try our object-centric demonstration replay:
 ```
-python run_rl_grasp.py task=grasp num_envs=16 task.env.asset.multiObjectList="union_ycb_unidex/example.yaml" +debug=test_demo_replay
+python run_rl_grasp.py task=grasp num_envs=16 task.env.asset.multiObjectList="union_ycb_unidex/example.yaml" +debug=test_demo_replay 
 ```
 You can see the Inspire hand grasping different objects with the same position, orientation, and hand pose.
+
+
+conda activate demograsp
+python run_rl_grasp.py \
+  task=grasp \
+  num_envs=16 \
+  task.env.asset.multiObjectList="union_ycb_unidex/example.yaml" \
+  +debug=test_demo_replay \
+  headless=True
+
 
 ## Play the trained RL policies
 
@@ -74,7 +84,8 @@ python run_rl_grasp.py \
     task.env.episodeLength=50 \
     task.env.enablePointCloud=True \
     train.params.is_vision=True \
-    checkpoint='ckpt/inspire.pt'
+    checkpoint='ckpt/inspire.pt' \
+    headless=True
 ```
 
 - Use `headless=True` on a headless machine. To evaluate on unseen object categories in DexGraspNet, set `task.env.asset.multiObjectList="union_ycb_unidex/test_set_unseen_cat.yaml"`.
@@ -138,11 +149,27 @@ python run_rl_grasp.py \
     task.env.episodeLength=40 \
     checkpoint='ckpt/inspire.pt' \
     +debug=collect_real_dataset \
-    num_envs=175 \
-    +num_episodes=30000
+    num_envs=100 \
+    +num_episodes=100
+    
+    num_envs=175 在单个 Isaac Gym 进程中同时运行 num_envs 个并行仿真环境。每一轮最多产生 num_envs 条轨迹，但只保存其中成功的轨迹。数值越大，采集吞吐通常越高，同时显存占用也越大。
+    +num_episodes=30000  本次需要保存的成功轨迹总数
 ```
 Set `+num_episodes` to the total number of successful trajectories to collect.
 The dataset will be saved in `data/datasets/$robot_name_$datetime` in LeRobot v2.0 format.
+
+Each newly collected dataset also contains replay metadata:
+
+- `meta/collection_config.json`: the resolved Hydra, task, render, and simulator configuration.
+- `meta/scenes.jsonl`: one scene record per successful LeRobot episode, with matching
+  `episode_index`. Each record contains the object asset and actor state, robot DOF
+  state and targets, camera-pad actor states, table actors, distractors, colors,
+  texture filenames, depth ranges, global lights, collection batch/env indices, and
+  the expert plan.
+
+Keep scene records from the same `collection_batch` together when replaying them in
+parallel because Isaac Gym lights are global to the simulator. Datasets collected
+before this metadata was added cannot be backfilled exactly from their RGB videos.
 
 - You can use any imitation learning method to train an RGB-based policy on this dataset. 
 To achieve sim-to-real deployment on your robot, you should revise the robot configurations, 

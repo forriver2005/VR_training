@@ -1,8 +1,10 @@
 import shutil
+import json
 import numpy as np
 from tqdm import tqdm
 import os, sys
-from typing import Dict, Any
+from pathlib import Path
+from typing import Dict, Any, Optional
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from lerobot.common.datasets.lerobot_dataset import LeRobotDataset, compute_stats, serialize_dict, write_json, STATS_PATH
@@ -91,8 +93,19 @@ class LerobotDatasetWriter:
             features=features,
         )
         self.push_to_hub = False
+
+        self.scene_metadata_path = Path(self.dataset.root) / "meta" / "scenes.jsonl"
+
+    def write_collection_metadata(self, metadata: Dict[str, Any]):
+        path = Path(self.dataset.root) / "meta" / "collection_config.json"
+        path.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
     
-    def append_step(self, data: Dict[str, np.ndarray], episode_end: bool = False):
+    def append_step(
+        self,
+        data: Dict[str, np.ndarray],
+        episode_end: bool = False,
+        episode_metadata: Optional[Dict[str, Any]] = None,
+    ):
         if 'right_arm_eef_pose' in data:
             state = np.concatenate([data['right_arm_eef_pose'], data['right_hand_qpos']], axis=-1).reshape(-1)
         else:
@@ -130,7 +143,12 @@ class LerobotDatasetWriter:
         self.dataset.add_frame(frame_data)
 
         if episode_end:
+            episode_index = self.dataset.meta.total_episodes
             self.dataset.save_episode(task=self.text_des)
+            if episode_metadata is not None:
+                record = {"episode_index": episode_index, **episode_metadata}
+                with self.scene_metadata_path.open("a", encoding="utf-8") as stream:
+                    stream.write(json.dumps(record, separators=(",", ":")) + "\n")
 
 
 class LerobotDatasetReader:
@@ -164,4 +182,3 @@ class LerobotDatasetReader:
         ret["right_hand_qpos"] = data["observation.state"][self.num_arm_actions:].cpu().numpy()
         ret["action"] = data["action"].cpu().numpy()
         return ret
-

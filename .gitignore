@@ -7,3 +7,7 @@ __pycache__/
 # Project-specific
 ckpt/
 runs_ppo/
+
+thirdparty/
+assets/
+data/

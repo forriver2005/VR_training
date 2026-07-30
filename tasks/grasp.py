@@ -352,6 +352,7 @@ class Grasp(VecTask):
         self.robot_indices = []
         self.object_indices = []
         self.distractor_object_indices = []
+        self.distractor_object_fns = []
         self.table_indices = []
         self.robot_start_states = []
         self.pc_features = []
@@ -414,11 +415,15 @@ class Grasp(VecTask):
 
             # add distractor objects
             if self.use_distractor_objects:
+                env_distractor_object_fns = []
                 for j in range(self.num_distractor_objects):
                     if self.multi_object:
-                        ast = random.choice(distractor_object_assets)
+                        distractor_asset_index = random.randrange(len(distractor_object_assets))
+                        ast = distractor_object_assets[distractor_asset_index]
+                        env_distractor_object_fns.append(self.object_fns[distractor_asset_index])
                     else:
                         ast = distractor_object_asset
+                        env_distractor_object_fns.append(distractor_object_urdf)
                     object_handle = self.gym.create_actor(
                         env_ptr, ast, gymapi.Transform(), "distractor", i, -1, 0
                     )
@@ -426,6 +431,7 @@ class Grasp(VecTask):
                         env_ptr, object_handle, gymapi.DOMAIN_SIM
                     )
                     self.distractor_object_indices.append(object_idx)
+                self.distractor_object_fns.append(env_distractor_object_fns)
 
             # add table
             table_handle = self.gym.create_actor(
@@ -874,24 +880,28 @@ class Grasp(VecTask):
                 # table textures
                 texture_fns = sorted(os.listdir(os.path.join(self.asset_root, self.render_randomization_params["texture_folder"], "background")))
                 self.background_texture_handles = []
+                self.background_texture_files = []
                 for fn in texture_fns:
                     if fn.endswith(".jpg") or fn.endswith(".png"):
                         texture_handle = self.gym.create_texture_from_file(
                             self.sim, os.path.join(self.asset_root, self.render_randomization_params["texture_folder"], "background", fn)
                         )
                         self.background_texture_handles.append(texture_handle)
-                    print(f"Loaded background texture: {fn}.")
+                        self.background_texture_files.append(fn)
+                        print(f"Loaded background texture: {fn}.")
 
                 # object textures
                 texture_fns = sorted(os.listdir(os.path.join(self.asset_root, self.render_randomization_params["texture_folder"], "object")))
                 self.object_texture_handles = []
+                self.object_texture_files = []
                 for fn in texture_fns:
                     if fn.endswith(".jpg") or fn.endswith(".png"):
                         texture_handle = self.gym.create_texture_from_file(
                             self.sim, os.path.join(self.asset_root, self.render_randomization_params["texture_folder"], "object", fn)
                         )
                         self.object_texture_handles.append(texture_handle)
-                    print(f"Loaded object texture: {fn}.")
+                        self.object_texture_files.append(fn)
+                        print(f"Loaded object texture: {fn}.")
                 self.white_texture = self.gym.create_texture_from_file(
                     self.sim, os.path.join(self.asset_root, self.render_randomization_params["texture_folder"], "white.png")
                 )
@@ -911,6 +921,10 @@ class Grasp(VecTask):
 
 
     def reset_idx(self, env_ids, object_init_pose=None, **kwargs):
+        if not hasattr(self, "_scene_visual_states"):
+            self._scene_visual_states = [None] * self.num_envs
+        self._scene_light_state = []
+
         ## randomization can happen only at reset time, since it can reset actor positions on GPU
         if self.randomize:
             self.apply_randomizations(self.randomization_params)
@@ -1073,14 +1087,25 @@ class Grasp(VecTask):
                 light_intensity_range = self.render_randomization_params['light_intensity']
                 light_ambient_range = self.render_randomization_params['light_ambient']
                 for i in range(self.render_randomization_params['num_lights']):
-                    l_intensity = gymapi.Vec3(*([random.uniform(*light_intensity_range)]*3))
-                    l_ambient = gymapi.Vec3(*[random.uniform(*light_ambient_range)]*3)
-                    l_direction = gymapi.Vec3(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1))
+                    intensity = [random.uniform(*light_intensity_range)] * 3
+                    ambient = [random.uniform(*light_ambient_range)] * 3
+                    direction = [random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1)]
+                    l_intensity = gymapi.Vec3(*intensity)
+                    l_ambient = gymapi.Vec3(*ambient)
+                    l_direction = gymapi.Vec3(*direction)
                     self.gym.set_light_parameters(self.sim, i, l_intensity, l_ambient, l_direction)
+                    self._scene_light_state.append({
+                        "index": i,
+                        "intensity": intensity,
+                        "ambient": ambient,
+                        "direction": direction,
+                    })
 
                 # randomize colors and texture
                 self.instructions = []
                 for env_id in env_ids:
+                    env_id = int(env_id)
+                    object_texture_index = None
                     # object and wall colors
                     color_name = random.choice(self.object_color_choices)
                     #if "{COLOR}" in self.instruction_template:
@@ -1109,12 +1134,14 @@ class Grasp(VecTask):
                             # 50% prob to make the object white
                             if np.random.rand() < 0.5:
                                 object_color[:] = 1
+                            object_texture_index = random.randrange(len(self.object_texture_handles))
                             self.gym.set_rigid_body_texture(
                                 self.envs[env_id], self.object_indices[0], 0, 
-                                gymapi.MESH_VISUAL, random.choice(self.object_texture_handles)
+                                gymapi.MESH_VISUAL, self.object_texture_handles[object_texture_index]
                             )
                         # else, no texture
                         else:
+                            object_texture_index = None
                             self.gym.set_rigid_body_texture(
                                 self.envs[env_id], self.object_indices[0], 0, 
                                 gymapi.MESH_VISUAL, self.white_texture
@@ -1133,11 +1160,13 @@ class Grasp(VecTask):
                         self.envs[env_id], self.wall_indices[0], 0,
                         gymapi.MESH_VISUAL, gymapi.Vec3(*wall_color)
                     )
+                    distractor_visuals = []
                     # distractor object colors
                     if self.use_distractor_objects:
                         distractor_object_color_choices = self.object_color_choices.copy()
                         # distractor_object_color_choices.remove(color_name)
                         for i in range(self.num_distractor_objects):
+                            distractor_texture_index = None
                             distractor_color = np.array(COLORS_DICT[random.choice(distractor_object_color_choices)]) + \
                                 np.random.uniform(
                                     -self.render_randomization_params['color'],
@@ -1151,12 +1180,14 @@ class Grasp(VecTask):
                                     # 50% prob to make the object white
                                     if np.random.rand() < 0.5:
                                         distractor_color[:] = 1
+                                    distractor_texture_index = random.randrange(len(self.object_texture_handles))
                                     self.gym.set_rigid_body_texture(
                                         self.envs[env_id], self.distractor_object_indices[0][i], 0, 
-                                        gymapi.MESH_VISUAL, random.choice(self.object_texture_handles)
+                                        gymapi.MESH_VISUAL, self.object_texture_handles[distractor_texture_index]
                                     )
                                 # else, no texture
                                 else:
+                                    distractor_texture_index = None
                                     self.gym.set_rigid_body_texture(
                                         self.envs[env_id], self.distractor_object_indices[0][i], 0, 
                                         gymapi.MESH_VISUAL, self.white_texture
@@ -1165,13 +1196,33 @@ class Grasp(VecTask):
                                 self.envs[env_id], self.distractor_object_indices[0][i], 0,
                                 gymapi.MESH_VISUAL, gymapi.Vec3(*distractor_color)
                             )
+                            distractor_visuals.append({
+                                "color": distractor_color.tolist(),
+                                "texture": self.object_texture_files[distractor_texture_index]
+                                if distractor_texture_index is not None
+                                else ("white.png" if self.object_random_texture else None),
+                            })
                     # table texture
+                    mat_texture_index = random.randrange(len(self.background_texture_handles))
+                    table_texture_index = random.randrange(len(self.background_texture_handles))
+                    wooden_table_texture_index = random.randrange(len(self.background_texture_handles))
                     self.gym.set_rigid_body_texture(self.envs[env_id], self.mat_indices[0], 0, 
-                        gymapi.MESH_VISUAL, random.choice(self.background_texture_handles))
+                        gymapi.MESH_VISUAL, self.background_texture_handles[mat_texture_index])
                     self.gym.set_rigid_body_texture(self.envs[env_id], self.table_indices[0], 0, 
-                        gymapi.MESH_VISUAL, random.choice(self.background_texture_handles))
+                        gymapi.MESH_VISUAL, self.background_texture_handles[table_texture_index])
                     self.gym.set_rigid_body_texture(self.envs[env_id], self.wooden_table_indices[0], 0, 
-                        gymapi.MESH_VISUAL, random.choice(self.background_texture_handles))
+                        gymapi.MESH_VISUAL, self.background_texture_handles[wooden_table_texture_index])
+                    self._scene_visual_states[env_id] = {
+                        "object_color": object_color.tolist(),
+                        "object_texture": self.object_texture_files[object_texture_index]
+                        if object_texture_index is not None
+                        else ("white.png" if self.object_random_texture else None),
+                        "wall_color": wall_color.tolist(),
+                        "mat_texture": self.background_texture_files[mat_texture_index],
+                        "table_texture": self.background_texture_files[table_texture_index],
+                        "wooden_table_texture": self.background_texture_files[wooden_table_texture_index],
+                        "distractors": distractor_visuals,
+                    }
 
                 # table positions
                 noise_table = torch_rand_float(-1, 1, (len(env_ids), 3), device=self.device) * \
@@ -1751,7 +1802,323 @@ class Grasp(VecTask):
         self.extras["current_successes"] = self.current_successes
         self.extras["has_hit_table"] = self.has_hit_table
         #print(self.has_hit_table)
-    
+
+    def capture_scene_states(self, env_ids):
+        """Return JSON-serializable simulator state needed to replay each environment reset."""
+        self.gym.refresh_dof_state_tensor(self.sim)
+        self.gym.refresh_actor_root_state_tensor(self.sim)
+        self.gym.refresh_rigid_body_state_tensor(self.sim)
+
+        scene_states = []
+        for env_id_value in env_ids:
+            env_id = int(env_id_value)
+
+            def actor_state(indices):
+                return self.root_state_tensor[indices[env_id]].detach().cpu().tolist()
+
+            scene = {
+                "scene_manifest_version": 1,
+                "object_asset": self.object_fns[env_id % len(self.object_fns)],
+                "object_root_state": actor_state(self.object_indices),
+                "robot_root_state": actor_state(self.robot_indices),
+                "robot_dof_state": self.robot_dof_state[env_id].detach().cpu().tolist(),
+                "robot_position_targets": self.prev_targets[env_id].detach().cpu().tolist(),
+                "table_root_state": actor_state(self.table_indices),
+                "table_height": float(self.table_heights[env_id].item()),
+                "camera_pad_root_states": [
+                    {
+                        "camera_id": int(camera_id),
+                        "root_state": actor_state(self.camera_pad_indices[camera_index]),
+                    }
+                    for camera_index, camera_id in enumerate(self.fixed_camera_ids)
+                ] if self.use_camera else [],
+                "depth_ranges": self.depth_ranges.tolist()
+                if self.use_camera and hasattr(self, "depth_ranges") else None,
+                "lights": deepcopy(getattr(self, "_scene_light_state", [])),
+                "visual": deepcopy(self._scene_visual_states[env_id])
+                if hasattr(self, "_scene_visual_states") else None,
+                "instruction": self.instructions[env_id]
+                if hasattr(self, "instructions") and len(self.instructions) > env_id
+                else self.instruction_template,
+            }
+
+            if self.render_cfg["appearance_realistic"]:
+                scene.update({
+                    "mat_root_state": actor_state(self.mat_indices),
+                    "wall_root_state": actor_state(self.wall_indices),
+                    "wooden_table_root_state": actor_state(self.wooden_table_indices),
+                })
+            if self.use_distractor_objects:
+                scene["distractors"] = [
+                    {
+                        "object_asset": self.distractor_object_fns[env_id][index],
+                        "root_state": self.root_state_tensor[
+                            self.distractor_object_indices[env_id, index]
+                        ].detach().cpu().tolist(),
+                    }
+                    for index in range(self.num_distractor_objects)
+                ]
+            else:
+                scene["distractors"] = []
+            scene_states.append(scene)
+
+        return scene_states
+
+    def restore_scene_states(self, env_ids, scene_states, replay_options=None):
+        """Restore captured scene records into matching source environment slots."""
+        if len(env_ids) != len(scene_states):
+            raise ValueError("env_ids and scene_states must have the same length")
+        if not scene_states:
+            return
+
+        if replay_options is None:
+            replay_options = {
+                "object_state": True,
+                "robot_state": True,
+                "camera_state": True,
+                "table_state": True,
+                "visual": True,
+                "lighting": True,
+            }
+
+        lights = scene_states[0].get("lights", [])
+        depth_ranges = scene_states[0].get("depth_ranges")
+        for scene in scene_states[1:]:
+            if replay_options["lighting"] and scene.get("lights", []) != lights:
+                raise ValueError("Scenes with different global lights cannot share one replay batch")
+            if replay_options["camera_state"] and scene.get("depth_ranges") != depth_ranges:
+                raise ValueError("Scenes with different depth ranges cannot share one replay batch")
+
+        root_indices = []
+        for env_id_value, scene in zip(env_ids, scene_states):
+            env_id = int(env_id_value)
+            expected_object = self.object_fns[env_id % len(self.object_fns)]
+            if scene["object_asset"] != expected_object:
+                raise ValueError(
+                    f"Scene object {scene['object_asset']!r} does not match env {env_id} "
+                    f"object {expected_object!r}"
+                )
+
+            def restore_actor(indices, key, use_train_state):
+                actor_index = indices[env_id]
+                if use_train_state:
+                    self.root_state_tensor[actor_index] = to_torch(
+                        scene[key], dtype=torch.float, device=self.device
+                    )
+                root_indices.append(actor_index)
+
+            restore_actor(
+                self.object_indices, "object_root_state", replay_options["object_state"]
+            )
+            restore_actor(
+                self.robot_indices, "robot_root_state", replay_options["robot_state"]
+            )
+            restore_actor(
+                self.table_indices, "table_root_state", replay_options["table_state"]
+            )
+            if self.render_cfg["appearance_realistic"]:
+                restore_actor(
+                    self.mat_indices, "mat_root_state", replay_options["table_state"]
+                )
+                restore_actor(
+                    self.wall_indices, "wall_root_state", replay_options["table_state"]
+                )
+                restore_actor(
+                    self.wooden_table_indices,
+                    "wooden_table_root_state",
+                    replay_options["table_state"],
+                )
+
+            camera_states = {
+                int(item["camera_id"]): item["root_state"]
+                for item in scene.get("camera_pad_root_states", [])
+            }
+            for camera_index, camera_id in enumerate(self.fixed_camera_ids):
+                if replay_options["camera_state"] and int(camera_id) not in camera_states:
+                    raise ValueError(f"Scene is missing camera pad state for camera {camera_id}")
+                actor_index = self.camera_pad_indices[camera_index][env_id]
+                if replay_options["camera_state"]:
+                    self.root_state_tensor[actor_index] = to_torch(
+                        camera_states[int(camera_id)], dtype=torch.float, device=self.device
+                    )
+                root_indices.append(actor_index)
+
+            if replay_options["robot_state"]:
+                robot_dof_state = to_torch(
+                    scene["robot_dof_state"], dtype=torch.float, device=self.device
+                )
+                if tuple(robot_dof_state.shape) != tuple(self.robot_dof_state[env_id].shape):
+                    raise ValueError(
+                        f"Robot DOF state shape {tuple(robot_dof_state.shape)} does not match "
+                        f"{tuple(self.robot_dof_state[env_id].shape)}"
+                    )
+                self.robot_dof_state[env_id] = robot_dof_state
+                targets = to_torch(
+                    scene["robot_position_targets"], dtype=torch.float, device=self.device
+                )
+                self.prev_targets[env_id] = targets
+                self.cur_targets[env_id] = targets
+            if replay_options["table_state"]:
+                self.table_heights[env_id] = float(scene["table_height"])
+
+            if self.use_distractor_objects:
+                distractors = scene.get("distractors", [])
+                if len(distractors) != self.num_distractor_objects:
+                    raise ValueError("Scene distractor count does not match the environment")
+                for index, distractor in enumerate(distractors):
+                    expected_asset = self.distractor_object_fns[env_id][index]
+                    if distractor["object_asset"] != expected_asset:
+                        raise ValueError(
+                            f"Distractor asset {distractor['object_asset']!r} does not match "
+                            f"env {env_id} asset {expected_asset!r}"
+                        )
+                    actor_index = self.distractor_object_indices[env_id, index]
+                    if replay_options["object_state"]:
+                        self.root_state_tensor[actor_index] = to_torch(
+                            distractor["root_state"], dtype=torch.float, device=self.device
+                        )
+                    root_indices.append(actor_index)
+
+            if replay_options["visual"]:
+                self._restore_scene_visual(env_id, scene.get("visual"))
+                self.instructions[env_id] = scene.get(
+                    "instruction", self.instruction_template
+                )
+
+        root_indices_tensor = torch.stack(root_indices).to(dtype=torch.int32)
+        self.gym.set_actor_root_state_tensor_indexed(
+            self.sim,
+            gymtorch.unwrap_tensor(self.root_state_tensor),
+            gymtorch.unwrap_tensor(root_indices_tensor),
+            len(root_indices_tensor),
+        )
+        robot_indices = self.robot_indices[env_ids].to(torch.int32)
+        self.gym.set_dof_position_target_tensor_indexed(
+            self.sim,
+            gymtorch.unwrap_tensor(self.prev_targets),
+            gymtorch.unwrap_tensor(robot_indices),
+            len(robot_indices),
+        )
+        self.gym.set_dof_state_tensor_indexed(
+            self.sim,
+            gymtorch.unwrap_tensor(self.robot_dof_state),
+            gymtorch.unwrap_tensor(robot_indices),
+            len(robot_indices),
+        )
+
+        captured_root_states = self.root_state_tensor[
+            root_indices_tensor.to(dtype=torch.long)
+        ].clone()
+        captured_dof_states = self.robot_dof_state[env_ids].clone()
+
+        # Update robot kinematics and camera attachments, then overwrite dynamic
+        # actor and DOF tensors again so the replay starts at the captured state.
+        self.gym.simulate(self.sim)
+        self.gym.fetch_results(self.sim, True)
+        self.root_state_tensor[root_indices_tensor.to(dtype=torch.long)] = captured_root_states
+        self.robot_dof_state[env_ids] = captured_dof_states
+        self.gym.set_actor_root_state_tensor_indexed(
+            self.sim,
+            gymtorch.unwrap_tensor(self.root_state_tensor),
+            gymtorch.unwrap_tensor(root_indices_tensor),
+            len(root_indices_tensor),
+        )
+        self.gym.set_dof_position_target_tensor_indexed(
+            self.sim,
+            gymtorch.unwrap_tensor(self.prev_targets),
+            gymtorch.unwrap_tensor(robot_indices),
+            len(robot_indices),
+        )
+        self.gym.set_dof_state_tensor_indexed(
+            self.sim,
+            gymtorch.unwrap_tensor(self.robot_dof_state),
+            gymtorch.unwrap_tensor(robot_indices),
+            len(robot_indices),
+        )
+
+        if replay_options["lighting"]:
+            for light in lights:
+                self.gym.set_light_parameters(
+                    self.sim,
+                    int(light["index"]),
+                    gymapi.Vec3(*light["intensity"]),
+                    gymapi.Vec3(*light["ambient"]),
+                    gymapi.Vec3(*light["direction"]),
+                )
+        if replay_options["camera_state"] and depth_ranges is not None:
+            self.depth_ranges = np.asarray(depth_ranges, dtype=np.float64)
+
+        self.gym.refresh_dof_state_tensor(self.sim)
+        self.gym.refresh_actor_root_state_tensor(self.sim)
+        self.gym.refresh_rigid_body_state_tensor(self.sim)
+        self.gym.refresh_jacobian_tensors(self.sim)
+        self.object_init_states[env_ids] = self.root_state_tensor[
+            self.object_indices[env_ids]
+        ].clone()
+        self.cur_ee_targets[env_ids] = self.rigid_body_states.view(-1, 13)[
+            self.eef_idx[env_ids], 0:7
+        ].clone()
+        self.compute_observations()
+        self.generate_reaching_plan_idx(env_ids)
+
+    def _restore_scene_visual(self, env_id, visual):
+        if visual is None or not self.apply_render_randomization:
+            return
+
+        def texture_handle(filename, files, handles):
+            try:
+                return handles[files.index(filename)]
+            except ValueError as exc:
+                if filename == "white.png":
+                    return self.white_texture
+                raise ValueError(f"Replay texture is unavailable: {filename}") from exc
+
+        object_texture = visual.get("object_texture")
+        if object_texture is not None:
+            self.gym.set_rigid_body_texture(
+                self.envs[env_id], self.object_indices[0], 0,
+                gymapi.MESH_VISUAL,
+                texture_handle(
+                    object_texture, self.object_texture_files, self.object_texture_handles
+                ),
+            )
+        self.gym.set_rigid_body_color(
+            self.envs[env_id], self.object_indices[0], 0,
+            gymapi.MESH_VISUAL, gymapi.Vec3(*visual["object_color"]),
+        )
+        self.gym.set_rigid_body_color(
+            self.envs[env_id], self.wall_indices[0], 0,
+            gymapi.MESH_VISUAL, gymapi.Vec3(*visual["wall_color"]),
+        )
+        for key, indices in (
+            ("mat_texture", self.mat_indices),
+            ("table_texture", self.table_indices),
+            ("wooden_table_texture", self.wooden_table_indices),
+        ):
+            self.gym.set_rigid_body_texture(
+                self.envs[env_id], indices[0], 0, gymapi.MESH_VISUAL,
+                texture_handle(
+                    visual[key], self.background_texture_files, self.background_texture_handles
+                ),
+            )
+
+        for index, distractor in enumerate(visual.get("distractors", [])):
+            distractor_texture = distractor.get("texture")
+            if distractor_texture is not None:
+                self.gym.set_rigid_body_texture(
+                    self.envs[env_id], self.distractor_object_indices[0][index], 0,
+                    gymapi.MESH_VISUAL,
+                    texture_handle(
+                        distractor_texture,
+                        self.object_texture_files,
+                        self.object_texture_handles,
+                    ),
+                )
+            self.gym.set_rigid_body_color(
+                self.envs[env_id], self.distractor_object_indices[0][index], 0,
+                gymapi.MESH_VISUAL, gymapi.Vec3(*distractor["color"]),
+            )
+
 
     # get obs same to the real-world
     def compute_real_observation_dict(self):

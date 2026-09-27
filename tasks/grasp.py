@@ -352,11 +352,28 @@ class Grasp(VecTask):
         self.robot_indices = []
         self.object_indices = []
         self.distractor_object_indices = []
+        self.fixed_box_indices = []
         self.distractor_object_fns = []
         self.table_indices = []
         self.robot_start_states = []
         self.pc_features = []
         self.table_start_pos, self.mat_start_pos = [], []
+
+        use_fixed_boxes = bool(self.cfg["env"]["asset"].get("useFixedBoxObstacles", False))
+        fixed_box_asset = None
+        fixed_box_positions = []
+        if use_fixed_boxes:
+            box_options = gymapi.AssetOptions()
+            box_options.fix_base_link = True
+            box_options.disable_gravity = True
+            fixed_box_asset = self.gym.load_asset(
+                self.sim, self.asset_root,
+                str(self.cfg["env"]["asset"].get("fixedBoxAssetFile", "stack_box/box.urdf")),
+                box_options,
+            )
+            fixed_box_positions = list(self.cfg["env"]["asset"].get(
+                "fixedBoxDefaultPositions", [[0.0, 0.0, 0.005]] * 3
+            ))
 
         for i in range(num_envs):
             env_ptr = self.gym.create_env(self.sim, lower, upper, num_per_row)
@@ -367,6 +384,9 @@ class Grasp(VecTask):
             if self.use_distractor_objects:
                 max_agg_bodies += self.num_distractor_objects * self.num_object_bodies
                 max_agg_shapes += self.num_distractor_objects * self.num_object_shapes
+            if fixed_box_asset is not None:
+                max_agg_bodies += len(fixed_box_positions) * self.gym.get_asset_rigid_body_count(fixed_box_asset)
+                max_agg_shapes += len(fixed_box_positions) * self.gym.get_asset_rigid_shape_count(fixed_box_asset)
             if self.use_camera:
                 # add camera pads
                 max_agg_bodies += len(self.fixed_camera_ids)
@@ -387,6 +407,13 @@ class Grasp(VecTask):
                 robot_start_pose.r.x,robot_start_pose.r.y,robot_start_pose.r.z,
                 robot_start_pose.r.w,0,0,0,0,0,0,])
             self.gym.set_actor_dof_properties(env_ptr, robot_actor, robot_dof_props)
+            # Match the boxed DemoGrasp contact material on the two-finger
+            # gripper. The stock URDF shape friction (0.01) is too low for the
+            # 20 mm cube and makes successful lifts simulator-dependent.
+            robot_shape_props = self.gym.get_actor_rigid_shape_properties(env_ptr, robot_actor)
+            for shape_prop in robot_shape_props:
+                shape_prop.friction = float(self.cfg["env"].get("gripperFriction", 1.2))
+            self.gym.set_actor_rigid_shape_properties(env_ptr, robot_actor, robot_shape_props)
             robot_idx = self.gym.get_actor_index(
                 env_ptr, robot_actor, gymapi.DOMAIN_SIM
             )
@@ -432,6 +459,17 @@ class Grasp(VecTask):
                     )
                     self.distractor_object_indices.append(object_idx)
                 self.distractor_object_fns.append(env_distractor_object_fns)
+
+            if fixed_box_asset is not None:
+                box_indices = []
+                for box_index, position in enumerate(fixed_box_positions):
+                    pose = gymapi.Transform()
+                    pose.p = gymapi.Vec3(*[float(value) for value in position])
+                    box_handle = self.gym.create_actor(
+                        env_ptr, fixed_box_asset, pose, f"fixed_box_{box_index}", i, -1, 0
+                    )
+                    box_indices.append(self.gym.get_actor_index(env_ptr, box_handle, gymapi.DOMAIN_SIM))
+                self.fixed_box_indices.append(box_indices)
 
             # add table
             table_handle = self.gym.create_actor(

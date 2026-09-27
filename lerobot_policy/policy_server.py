@@ -9,6 +9,7 @@ from pathlib import Path
 
 import numpy as np
 import torch
+from lerobot.configs.policies import PreTrainedConfig
 from lerobot.policies.act.modeling_act import ACTPolicy
 from lerobot.policies.factory import make_pre_post_processors
 
@@ -21,17 +22,24 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=5555)
     parser.add_argument("--device", default="cuda")
+    parser.add_argument("--seed", type=int)
+    parser.add_argument("--n-action-steps", type=int)
     return parser.parse_args()
 
 
 class ACTInferenceServer:
-    def __init__(self, checkpoint: Path, device: str) -> None:
+    def __init__(self, checkpoint: Path, device: str, n_action_steps: int | None = None) -> None:
         self.device = torch.device(device)
         if self.device.type == "cuda" and not torch.cuda.is_available():
             raise RuntimeError("CUDA was requested but is not available")
 
         checkpoint = checkpoint.expanduser().resolve()
-        self.policy = ACTPolicy.from_pretrained(checkpoint).to(self.device).eval()
+        policy_config = PreTrainedConfig.from_pretrained(checkpoint)
+        if n_action_steps is not None:
+            if n_action_steps <= 0 or n_action_steps > policy_config.chunk_size:
+                raise ValueError(f"n_action_steps must be in [1, {policy_config.chunk_size}]")
+            policy_config.n_action_steps = n_action_steps
+        self.policy = ACTPolicy.from_pretrained(checkpoint, config=policy_config).to(self.device).eval()
         self.preprocessor, self.postprocessor = make_pre_post_processors(
             policy_cfg=self.policy.config,
             pretrained_path=str(checkpoint),
@@ -95,7 +103,7 @@ class ACTInferenceServer:
 
 def main() -> None:
     args = parse_args()
-    server = ACTInferenceServer(args.checkpoint, args.device)
+    server = ACTInferenceServer(args.checkpoint, args.device, args.n_action_steps)
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listener:
         listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         listener.bind((args.host, args.port))
@@ -117,4 +125,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

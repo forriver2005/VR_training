@@ -157,7 +157,7 @@ def metric(env) -> dict:
     z_delta = float((a[2] - b[2]).item())
     speed_a = float(torch.linalg.vector_norm(a[7:10]).item())
     speed_b = float(torch.linalg.vector_norm(b[7:10]).item())
-    return {"success": xy <= 0.009 and abs(z_delta - 0.025) <= 0.004 and
+    return {"success": xy <= 0.009 and abs(z_delta - 0.0225) <= 0.004 and
             float(a[2]) >= 0.031 and speed_a <= 0.05 and speed_b <= 0.05,
             "xy_error_m": xy, "z_delta_m": z_delta,
             "cube_a_speed_mps": speed_a, "cube_b_speed_mps": speed_b}
@@ -171,7 +171,13 @@ def main(cfg) -> None:
     limit = int(cfg.get("v3_limit", 3))
     policy_port = int(cfg.get("v3_policy_port", 5555))
     set_np_formatting()
-    rows = scene_rows(manifest, limit)
+    start = int(cfg.get("v3_start", 0))
+    stride = int(cfg.get("v3_stride", 1))
+    if stride <= 0:
+        raise ValueError("v3_stride must be positive")
+    rows = scene_rows(manifest, None)[start::stride][:limit]
+    if not rows:
+        raise ValueError("Selected episode range is empty")
     configure(cfg)
     cfg.seed = set_seed(42, torch_deterministic=True, rank=0)
     output.mkdir(parents=True, exist_ok=True)
@@ -182,13 +188,23 @@ def main(cfg) -> None:
         for row in rows:
             set_scene(env, row)
             client.reset()
+            video = cv2.VideoWriter(
+                str(output / f"episode_{int(row['episode_index']):06d}.mp4"),
+                cv2.VideoWriter_fourcc(*"mp4v"), 10, (512, 256),
+            )
+            if not video.isOpened():
+                raise RuntimeError("Could not open replay video writer")
+            states, actions = [], []
             last = None
             for step in range(40):
                 obs, frames = observation(env)
+                video.write(cv2.cvtColor(np.concatenate([f[0] for f in frames], axis=1), cv2.COLOR_RGB2BGR))
                 action = client.predict(obs)
                 if action.shape != (1, 8):
                     raise RuntimeError(f"unexpected action shape {action.shape}")
                 last = environment_action(env, action)
+                states.append(obs["observation.state"][0].copy())
+                actions.append(action[0].copy())
                 env.step(last)
             # Continue physics with the final target so the stack settles. The
             # enlarged episodeLength prevents an automatic reset at step 40.
@@ -199,6 +215,9 @@ def main(cfg) -> None:
             env.gym.refresh_actor_root_state_tensor(env.sim)
             env.gym.refresh_rigid_body_state_tensor(env.sim)
             result = {"episode_index": int(row["episode_index"]), **metric(env)}
+            video.release()
+            np.savez_compressed(output / f"episode_{int(row['episode_index']):06d}.npz",
+                                state=np.asarray(states), action=np.asarray(actions))
             results.append(result)
             print(json.dumps(result), flush=True)
     finally:

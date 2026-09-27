@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import random
 import socket
 from pathlib import Path
 
@@ -28,7 +29,8 @@ def parse_args() -> argparse.Namespace:
 
 
 class ACTInferenceServer:
-    def __init__(self, checkpoint: Path, device: str, n_action_steps: int | None = None) -> None:
+    def __init__(self, checkpoint: Path, device: str, n_action_steps: int | None = None, seed: int = 0) -> None:
+        self.seed = seed
         self.device = torch.device(device)
         if self.device.type == "cuda" and not torch.cuda.is_available():
             raise RuntimeError("CUDA was requested but is not available")
@@ -49,6 +51,16 @@ class ACTInferenceServer:
         self.policy.reset()
         print(f"Loaded ACT checkpoint: {checkpoint}", flush=True)
         print(f"Input features: {list(self.input_features)}", flush=True)
+
+    def reset(self) -> None:
+        random.seed(self.seed)
+        np.random.seed(self.seed)
+        torch.manual_seed(self.seed)
+        if self.device.type == "cuda":
+            torch.cuda.manual_seed_all(self.seed)
+        self.policy.reset()
+        self.preprocessor.reset()
+        self.postprocessor.reset()
 
     def _tensor_from_request(self, key: str, value: np.ndarray) -> torch.Tensor:
         expected = self.input_features[key]
@@ -92,7 +104,7 @@ class ACTInferenceServer:
             if command == "ping":
                 send_arrays(connection, command_message("pong"))
             elif command == "reset":
-                self.policy.reset()
+                self.reset()
                 send_arrays(connection, command_message("ok"))
             elif command == "predict":
                 action = self.predict(request)
@@ -103,7 +115,7 @@ class ACTInferenceServer:
 
 def main() -> None:
     args = parse_args()
-    server = ACTInferenceServer(args.checkpoint, args.device, args.n_action_steps)
+    server = ACTInferenceServer(args.checkpoint, args.device, args.n_action_steps, args.seed or 0)
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listener:
         listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         listener.bind((args.host, args.port))

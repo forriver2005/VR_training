@@ -174,6 +174,9 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--eval-index", type=int, help="evaluate exactly one dataset episode")
     p.add_argument("--policy-host", default="127.0.0.1")
     p.add_argument("--policy-port", type=int, default=5555)
+    p.add_argument("--policy-rgb-codec", choices=("h264", "raw"), default="h264")
+    p.add_argument("--eval-episode-npz", type=Path,
+                   help="frozen actions and initial joint/state telemetry for exact-episode evaluation")
     return p
 
 
@@ -524,10 +527,12 @@ def _replay_with_simulation(args: argparse.Namespace, episodes: list[dict]) -> N
                 "retargeting": "source XY preserved; Z adapted to resized cubes, carry clearance, held descent, open and retreat",
                 "official_fr3v2_commit": "7aeeddc449edf8d62b594f9e36a81da53e7796f9"}
     manifest["raw_root"] = str(args.raw_root.resolve())
-    manifest["source_sha256"] = {
-        str(path.resolve()): hashlib.sha256(path.read_bytes()).hexdigest()
-        for path in [args.usd, args.urdf, replay_urdf] + [args.raw_root / name for name in scene_files]
-    }
+    manifest["source_sha256"] = {}
+    for path in [args.usd, args.urdf, replay_urdf] + [args.raw_root / name for name in scene_files]:
+        # v3 closed-loop evaluation may intentionally use the frozen scene
+        # manifest after the original demonstration JSON was archived.
+        if path.is_file():
+            manifest["source_sha256"][str(path.resolve())] = hashlib.sha256(path.read_bytes()).hexdigest()
     manifest["configured_scene_sha256"] = hashlib.sha256(configured_scene_path.read_bytes()).hexdigest()
     manifest.update(cube_a_size_m=0.02, cube_b_size_m=0.025, cube_a_mass_kg=0.05, cube_b_mass_kg=0.08,
                     physics_dt_s=1 / 120, physics_steps_per_frame=args.physics_steps_per_frame,
@@ -550,7 +555,8 @@ def _replay_with_simulation(args: argparse.Namespace, episodes: list[dict]) -> N
         send_arrays(policy_socket, command_message("ping"))
         if read_command(receive_arrays(policy_socket)) != "pong":
             raise RuntimeError("Policy server did not answer ping")
-        policy_roundtrips = [H264FrameRoundTrip(), H264FrameRoundTrip()]
+        if args.policy_rgb_codec == "h264":
+            policy_roundtrips = [H264FrameRoundTrip(), H264FrameRoundTrip()]
     for candidate_index, item in enumerate(episodes):
         if counts[item["source_file"]] >= args.per_scene or (item["source_file"], item["trajectory_id"]) in attempted:
             continue
@@ -586,16 +592,18 @@ def _replay_with_simulation(args: argparse.Namespace, episodes: list[dict]) -> N
         retargeted = item["action"].copy()
         # Preserve recorded offsets while retargeting the source cube heights
         # to the explicitly requested 20 mm and 25 mm geometry.
-        grasp_delta = float(resting_a[2]) - float(item["cube_a"][2])
-        place_delta = float(resting_b[2]) + 0.0125 + 0.01 + 0.005 - float(retargeted[32, 2])
+        grasp_delta = 0.0 if item.get("action_retargeted") else float(resting_a[2]) - float(item["cube_a"][2])
+        place_delta = 0.0 if item.get("action_retargeted") else float(resting_b[2]) + 0.0125 + 0.01 + 0.005 - float(retargeted[32, 2])
         retargeted[:12, 2] += grasp_delta
         retargeted[12:32, 2] += np.linspace(grasp_delta, place_delta, 20)
         retargeted[32:, 2] += place_delta
         # The smaller target leaves less clearance for the unchanged fingers.
         # Carry above its top, descend while still holding, then release.
-        retargeted[14:32, 2] = np.maximum(retargeted[14:32, 2], float(resting_b[2]) + 0.0575)
+        if not item.get("action_retargeted"):
+            retargeted[14:32, 2] = np.maximum(retargeted[14:32, 2], float(resting_b[2]) + 0.0575)
         retargeted[32, 7] = retargeted[31, 7]
-        retargeted[34:, 2] += np.linspace(0.0, 0.08, 6)
+        if not item.get("action_retargeted"):
+            retargeted[34:, 2] += np.linspace(0.0, 0.08, 6)
         first = retargeted[0]
         start_q, start_ok = ik.compute_inverse_kinematics(ik_frame, first[:3] + [-0.615, 0, 0], first[[6, 3, 4, 5]], position_tolerance=0.001)
         if not start_ok:
@@ -607,8 +615,20 @@ def _replay_with_simulation(args: argparse.Namespace, episodes: list[dict]) -> N
         # recording observation frame 0.
         for step in range(120):
             world.step(render=(step == 119))
+        if args.eval_episode_npz is not None:
+            with np.load(args.eval_episode_npz) as frozen:
+                initial_q = np.r_[frozen["joint_position"][0],
+                                  frozen["state"][0, 7], frozen["state"][0, 7]].astype(np.float32)
+            robot.set_joint_positions(initial_q)
+            robot.set_joint_velocities(np.zeros(9))
+            robot.apply_action(ArticulationAction(joint_positions=initial_q))
+            for step in range(12):
+                world.step(render=(step == 11))
         cube_history = []
         ik_failures = 0
+        policy_action_clipped = 0
+        policy_quaternion_fallbacks = 0
+        policy_inference_calls = 0
         grasp_xy_errors = []
         if policy_socket is not None:
             send_arrays(policy_socket, command_message("reset"))
@@ -653,6 +673,10 @@ def _replay_with_simulation(args: argparse.Namespace, episodes: list[dict]) -> N
                 prediction = receive_arrays(policy_socket)
                 if read_command(prediction) != "action" or prediction["action"].shape != (1, 8):
                     raise RuntimeError(f"Invalid policy action at frame {frame_index}")
+                policy_action_clipped += int(bool(prediction.get("action_clipped", np.asarray(False)).item()))
+                policy_quaternion_fallbacks += int(bool(prediction.get("quaternion_fallback", np.asarray(False)).item()))
+                policy_inference_calls = max(policy_inference_calls,
+                                             int(prediction.get("inference_calls", np.asarray(0)).item()))
                 target = prediction["action"][0]
             target_position = target[:3].astype(np.float64).copy()
             # Source trajectories are expressed in the FR3 base frame.  The
@@ -743,6 +767,9 @@ def _replay_with_simulation(args: argparse.Namespace, episodes: list[dict]) -> N
                 "xy_error_m": xy, "z_delta_m": zd, "settled_position_drift_m": position_drift.tolist(),
                 "grasp_xy_error_m": grasp_xy_error,
                 "ik_failures": ik_failures,
+                "policy_action_clipping_count": policy_action_clipped,
+                "policy_quaternion_fallback_count": policy_quaternion_fallbacks,
+                "policy_inference_calls": policy_inference_calls,
             }, indent=2) + "\n", encoding="utf-8")
         if success or policy_socket is not None:
             np.savez_compressed(out / f"episode_{episode_index:06d}.npz", state=state, action=action,
@@ -763,6 +790,9 @@ def _replay_with_simulation(args: argparse.Namespace, episodes: list[dict]) -> N
                         "cube_a_speed_mps": speed_a, "cube_b_speed_mps": speed_b,
                         "settled_position_drift_m": position_drift.tolist(),
                         "lifted": bool(lifted), "stable_samples": sum(stable), "ik_failures": ik_failures,
+                        "policy_action_clipping_count": policy_action_clipped,
+                        "policy_quaternion_fallback_count": policy_quaternion_fallbacks,
+                        "policy_inference_calls": policy_inference_calls,
                         "cube_history": cube_history,
                         "demo_grasp_modality": "eefpose+handdof; state/action shape (8,), two RGB cameras",
                         "joint_audit": {"names": dof_names[:7], "state_saved": True, "target_saved": True},
@@ -807,8 +837,38 @@ def main() -> None:
             raise ValueError("--trajectories entries must be SCENE:TRAJECTORY pairs") from exc
         if any(len(pair) != 2 for pair in trajectory_pairs):
             raise ValueError("--trajectories entries must be SCENE:TRAJECTORY pairs")
-    episodes = load_episodes(args.raw_root.resolve(), args.max_episodes, args.scene_count, args.per_scene,
-                             args.scene_ids, args.candidate_multiplier, trajectory_pairs)
+    try:
+        episodes = load_episodes(args.raw_root.resolve(), args.max_episodes, args.scene_count, args.per_scene,
+                                 args.scene_ids, args.candidate_multiplier, trajectory_pairs)
+    except FileNotFoundError:
+        # Closed-loop evaluation can use the frozen v3 scene manifest directly.
+        # It contains the retargeted 40-step expert plan and box poses, so no
+        # source demonstration JSON is needed and no expert action is regenerated.
+        if args.eval_manifest is None:
+            raise
+        scene_rows = [json.loads(line) for line in args.eval_manifest.read_text().splitlines() if line.strip()]
+        row = scene_rows[args.eval_index]
+        episodes = [{
+            "source_file": row["source_file"],
+            "trajectory_id": int(row["trajectory_id"]),
+            "action": np.asarray(row["expert_plan"], dtype=np.float32),
+            "action_retargeted": True,
+            "cube_a": np.asarray(row["cube_a_initial_xyz"], dtype=np.float32),
+            "cube_b": np.asarray(row["cube_b_initial_xyz"], dtype=np.float32),
+            "cube_a_rotation": np.asarray(row["cube_a_rotation_xyzw"], dtype=np.float32),
+            "cube_b_rotation": np.asarray(row["cube_b_rotation_xyzw"], dtype=np.float32),
+            "boxes": {key: {"position": np.asarray(value["position"], dtype=np.float32),
+                            "rotation": np.asarray(value["rotation"], dtype=np.float32)}
+                      for key, value in row["boxes"].items()},
+        }]
+    if args.eval_episode_npz is not None:
+        if args.eval_manifest is None or len(episodes) != 1:
+            raise ValueError("--eval-episode-npz requires exactly one --eval-manifest episode")
+        with np.load(args.eval_episode_npz) as frozen:
+            if frozen["action"].shape != (40, 8) or frozen["joint_position"].shape != (40, 7):
+                raise ValueError("Invalid frozen episode shapes")
+            episodes[0]["action"] = frozen["action"].copy()
+            episodes[0]["action_retargeted"] = True
     if trajectory_pairs is not None:
         found = {(int(item["source_file"].split("_")[1]), item["trajectory_id"]) for item in episodes}
         missing = trajectory_pairs - found

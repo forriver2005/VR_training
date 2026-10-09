@@ -42,6 +42,7 @@ def main():
     p.add_argument('--sim-gpu',default='0')
     p.add_argument('--first-seed',type=int,default=0)
     p.add_argument('--count',type=int,default=10)
+    p.add_argument('--port-base',type=int,default=5600,help='separate ports for concurrent evaluation groups')
     p.add_argument('--episode-npz',type=Path,default=ROOT/'data/isaacsim_trajectorysuccessful2_fr3v2_strict_friction12_20260927/episode_000000.npz')
     p.add_argument('--restore-recorded-joints',action='store_true',help='diagnostic only; standard reset is default')
     p.add_argument('--pointcloud',action='store_true')
@@ -56,7 +57,7 @@ def main():
     results=[]
     for seed in range(args.first_seed,args.first_seed+args.count):
         trial=args.output/f'seed_{seed:02d}'; trial.mkdir(parents=True,exist_ok=True)
-        port=5600+seed; server=sim=log=sim_log=None
+        port=args.port_base+seed; server=sim=log=sim_log=None
         try:
             env=dict(os.environ,CUDA_VISIBLE_DEVICES=args.server_gpu,OMNI_KIT_ACCEPT_EULA='YES',OMNI_KIT_ALLOW_ROOT='1')
             log=(trial/'policy.log').open('w')

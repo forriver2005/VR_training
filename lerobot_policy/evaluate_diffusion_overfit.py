@@ -20,7 +20,7 @@ def main():
     args.output.mkdir(parents=True,exist_ok=True)
     with np.load(args.source) as data: ep={k:data[k] for k in data.files}
     inference=Inference(args.checkpoint,args.device)
-    results=[]; predictions=[]; raw_predictions=[]
+    results=[]; predictions=[]; raw_predictions=[]; position_errors=[]; gripper_errors=[]
     for seed in args.seeds:
         inference.reset(seed); predicted=[]; raw=[]; wall=time.monotonic()
         for t in range(40):
@@ -40,11 +40,20 @@ def main():
             inference_calls=inference.inference_calls,action_clipping_count=inference.clip_count,
             quaternion_fallback_count=inference.quaternion_fallbacks,elapsed_s=time.monotonic()-wall)
         results.append(result); predictions.append(pred); raw_predictions.append(raw)
+        position_errors.append(pos); gripper_errors.append(grip)
         print(json.dumps(result),flush=True)
     report=dict(checkpoint=str(args.checkpoint.resolve()),source=str(args.source.resolve()),
         protocol='recorded observations before each action; H=2 K=16 A=8; EMA DDPM100; 5 replans over 40 steps',
         trials=results,mean={k:float(np.mean([v[k] for v in results])) for k in
             ['position_mean_m','quaternion_mean_deg','gripper_mean_m','position_max_m','quaternion_max_deg','gripper_max_m']})
+    pos=np.asarray(position_errors); grip=np.asarray(gripper_errors)
+    report['stages']={name:dict(position_mean_m=float(pos[:,start:end].mean()),
+        position_max_m=float(pos[:,start:end].max()),gripper_mean_m=float(grip[:,start:end].mean()),
+        gripper_max_m=float(grip[:,start:end].max()))
+        for name,start,end in [('first_block',0,8),('approach_close',8,12),('carry',12,32),('release_retreat',32,40)]}
+    report['per_frame']=[dict(frame=t,position_mean_m=float(pos[:,t].mean()),
+        position_max_m=float(pos[:,t].max()),gripper_mean_m=float(grip[:,t].mean()),
+        gripper_max_m=float(grip[:,t].max())) for t in range(40)]
     (args.output/'offline_metrics.json').write_text(json.dumps(report,indent=2)+'\n')
     np.savez_compressed(args.output/'offline_predictions.npz',seeds=args.seeds,predicted_action=predictions,
                         raw_action=raw_predictions,target_action=ep['action'])

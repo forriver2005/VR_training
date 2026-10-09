@@ -14,6 +14,7 @@ from diffusion_overfit_common import RAW, make_config, make_normalization, vecto
 from lerobot.policies.diffusion.modeling_diffusion import DiffusionPolicy
 from pointcloud_diffusion import PointCloudPolicy
 from rgbd_geometry import geometry_contract, normalize_points
+from lerobot.configs.types import FeatureType, PolicyFeature
 
 def main():
     p = argparse.ArgumentParser()
@@ -27,6 +28,11 @@ def main():
     p.add_argument('--log-every',type=int,default=100)
     p.add_argument('--resume',type=Path)
     p.add_argument('--modality',choices=['rgb','pointcloud'],default='rgb')
+    p.add_argument('--window-sampling',choices=['all','replan'],default='all',
+                   help='all 40 anchors or the five anchors used by A=8 online replanning')
+    p.add_argument('--history-validity',action='store_true',help='mark padded versus measured observation history')
+    p.add_argument('--prediction-type',choices=['epsilon','sample'],default='epsilon',
+                   help='diffusion target: noise or clean normalized action; record as an independent ablation')
     args = p.parse_args()
     torch.set_num_threads(4)
     torch.backends.cudnn.benchmark = True
@@ -53,8 +59,13 @@ def main():
     actions = vector_transform(torch.tensor(episode['action'],device=args.device),norm)
     if actions.abs().max()>1.00001: raise ValueError('Expert actions exceed fixed bounds')
     config=make_config(args.device)
+    config.prediction_type=args.prediction_type
     if args.modality=='pointcloud':
         config.input_features={'observation.state':config.input_features['observation.state']}
+        if args.history_validity:
+            config.input_features['observation.history_valid']=PolicyFeature(FeatureType.STATE,(1,))
+    elif args.history_validity:
+        raise ValueError('History validity currently supported only for pointcloud')
     model = (PointCloudPolicy(config) if args.modality=='pointcloud' else DiffusionPolicy(config)).to(args.device).train()
     ema = copy.deepcopy(model).eval().requires_grad_(False)
     optimizer = torch.optim.AdamW(model.parameters(),lr=1e-4,betas=(.95,.999),weight_decay=1e-6)
@@ -70,13 +81,23 @@ def main():
             raise ValueError('Resume dataset/normalization mismatch')
         if saved.get('modality','rgb')!=args.modality or saved.get('steps',args.steps)!=args.steps:
             raise ValueError('Resume modality/training schedule mismatch')
+        if saved.get('window_sampling','all')!=args.window_sampling:
+            raise ValueError('Resume window sampling mismatch')
+        if saved.get('history_validity',False)!=args.history_validity:
+            raise ValueError('Resume history validity mismatch')
+        if saved.get('prediction_type','epsilon')!=args.prediction_type:
+            raise ValueError('Resume diffusion target mismatch')
         model.load_state_dict(saved['model']); ema.load_state_dict(saved['ema'])
         optimizer.load_state_dict(saved['optimizer']); scheduler.load_state_dict(saved['scheduler'])
         torch.set_rng_state(saved['torch_rng'].cpu())
         torch.cuda.set_rng_state_all([v.cpu() for v in saved['cuda_rng']])
         random.setstate(saved['python_rng']); np.random.set_state(saved['numpy_rng']); start=saved['step']
     contract = dict(source=str(args.source.resolve()),source_sha256=source_hash,steps=args.steps,
-        batch_size=args.batch_size,seed=args.seed,H=2,K=16,A=8,frames=40,windows=40,
+        batch_size=args.batch_size,seed=args.seed,H=2,K=16,A=8,frames=40,
+        windows=40 if args.window_sampling=='all' else 5,window_sampling=args.window_sampling,
+        history_validity=args.history_validity,
+        prediction_type=args.prediction_type,
+        window_anchors=list(range(40)) if args.window_sampling=='all' else list(range(0,40,8)),
         observation_indices=[-1,0],action_indices=list(range(-1,15)),padding='repeat boundary frames',
         augmentation=False,crop=False,network='shared ResNet18 GroupNorm + UNet [64,128,256]',
         ema_power=.75,ddpm_steps=100,optimizer='AdamW lr=1e-4 betas=(.95,.999) wd=1e-6',
@@ -98,11 +119,14 @@ def main():
         **{k:contract[k] for k in ['H','K','A','windows','batch_size']})),flush=True)
     params,shadow=list(model.parameters()),list(ema.parameters())
     offsets=torch.arange(-1,15,device=args.device)
+    anchors=torch.tensor(contract['window_anchors'],device=args.device)
     for step in range(start+1,args.steps+1):
-        t=torch.randint(40,(args.batch_size,),device=args.device)
+        t=anchors[torch.randint(len(anchors),(args.batch_size,),device=args.device)]
         history=(t[:,None]+torch.tensor([-1,0],device=args.device)).clamp(0,39)
         future=t[:,None]+offsets
         batch={k:v[history] for k,v in obs.items()}
+        if args.history_validity:
+            batch['observation.history_valid']=(t[:,None]+torch.tensor([-1,0],device=args.device)>=0).float().unsqueeze(-1)
         batch['action']=actions[future.clamp(0,39)]
         batch['action_is_pad']=(future<0)|(future>=40)
         optimizer.zero_grad(set_to_none=True)
@@ -131,7 +155,8 @@ def main():
             torch.save(dict(step=step,model=model.state_dict(),ema=ema.state_dict(),optimizer=optimizer.state_dict(),
                 scheduler=scheduler.state_dict(),torch_rng=torch.get_rng_state(),cuda_rng=torch.cuda.get_rng_state_all(),
                 python_rng=random.getstate(),numpy_rng=np.random.get_state(),normalization=norm,source_sha256=source_hash,
-                modality=args.modality,steps=args.steps),
+                modality=args.modality,steps=args.steps,window_sampling=args.window_sampling,
+                history_validity=args.history_validity,prediction_type=args.prediction_type),
                 checkpoint/'training_state.pt')
             (args.output/'latest_checkpoint.txt').write_text(str(checkpoint.resolve())+'\n')
             print(f'Saved EMA and resumable checkpoint at step {step}',flush=True)

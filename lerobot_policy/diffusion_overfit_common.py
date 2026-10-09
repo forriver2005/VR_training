@@ -56,6 +56,7 @@ class Inference:
         config = PreTrainedConfig.from_pretrained(checkpoint)
         config.device = device
         self.modality=json.loads((checkpoint/'run_config.json').read_text()).get('modality','rgb')
+        self.history_validity='observation.history_valid' in config.input_features
         policy_class=DiffusionPolicy
         if self.modality=='pointcloud':
             from pointcloud_diffusion import PointCloudPolicy
@@ -69,6 +70,7 @@ class Inference:
         if seed is not None: self.seed = int(seed)
         self.rng = torch.Generator(device=self.device).manual_seed(self.seed)
         self.history,self.actions = deque(maxlen=2),deque()
+        self.history_valid=deque(maxlen=2)
         self.previous_quaternion = None
         self.inference_calls = self.clip_count = self.quaternion_fallbacks = 0
 
@@ -84,13 +86,19 @@ class Inference:
         else:
             obs = observation_tensors(state,images,self.norm,self.device)
         self.history.append(obs)
-        if len(self.history)==1: self.history.append(obs)
+        self.history_valid.append(True)
+        if len(self.history)==1:
+            self.history.append(obs)
+            self.history_valid.appendleft(False)
         if not self.actions:
             states = torch.stack([v['observation.state'] for v in self.history],dim=1)
             dm = self.policy.diffusion
             if self.modality=='pointcloud':
                 pc=torch.stack([v['observation.point_cloud'] for v in self.history],dim=1)
-                cond=dm._prepare_global_conditioning({'observation.state':states,'observation.point_cloud':pc})
+                condition={'observation.state':states,'observation.point_cloud':pc}
+                if self.history_validity:
+                    condition['observation.history_valid']=torch.tensor(list(self.history_valid),device=self.device,dtype=states.dtype).reshape(1,2,1).expand(states.shape[0],-1,-1)
+                cond=dm._prepare_global_conditioning(condition)
             else:
                 rgb = torch.stack([torch.stack([v[k] for k in CAMERAS],dim=1) for v in self.history],dim=1)
                 cond = dm._prepare_global_conditioning({'observation.state':states,'observation.images':rgb})

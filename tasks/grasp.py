@@ -360,20 +360,24 @@ class Grasp(VecTask):
         self.table_start_pos, self.mat_start_pos = [], []
 
         use_fixed_boxes = bool(self.cfg["env"]["asset"].get("useFixedBoxObstacles", False))
-        fixed_box_asset = None
+        fixed_box_assets = []
         fixed_box_positions = []
         if use_fixed_boxes:
             box_options = gymapi.AssetOptions()
             box_options.fix_base_link = True
             box_options.disable_gravity = True
-            fixed_box_asset = self.gym.load_asset(
-                self.sim, self.asset_root,
-                str(self.cfg["env"]["asset"].get("fixedBoxAssetFile", "stack_box/box.urdf")),
-                box_options,
-            )
+            box_options.collapse_fixed_joints = True
             fixed_box_positions = list(self.cfg["env"]["asset"].get(
                 "fixedBoxDefaultPositions", [[0.0, 0.0, 0.005]] * 3
             ))
+            box_files = list(self.cfg["env"]["asset"].get("fixedBoxAssetFiles", []))
+            if not box_files:
+                box_files = [str(self.cfg["env"]["asset"].get(
+                    "fixedBoxAssetFile", "stack_box/box.urdf"))] * len(fixed_box_positions)
+            if len(box_files) != len(fixed_box_positions):
+                raise ValueError("fixedBoxAssetFiles and fixedBoxDefaultPositions must have equal length")
+            fixed_box_assets = [self.gym.load_asset(self.sim, self.asset_root, path, box_options)
+                                for path in box_files]
 
         for i in range(num_envs):
             env_ptr = self.gym.create_env(self.sim, lower, upper, num_per_row)
@@ -384,9 +388,11 @@ class Grasp(VecTask):
             if self.use_distractor_objects:
                 max_agg_bodies += self.num_distractor_objects * self.num_object_bodies
                 max_agg_shapes += self.num_distractor_objects * self.num_object_shapes
-            if fixed_box_asset is not None:
-                max_agg_bodies += len(fixed_box_positions) * self.gym.get_asset_rigid_body_count(fixed_box_asset)
-                max_agg_shapes += len(fixed_box_positions) * self.gym.get_asset_rigid_shape_count(fixed_box_asset)
+            if fixed_box_assets:
+                max_agg_bodies += sum(self.gym.get_asset_rigid_body_count(asset)
+                                      for asset in fixed_box_assets)
+                max_agg_shapes += sum(self.gym.get_asset_rigid_shape_count(asset)
+                                      for asset in fixed_box_assets)
             if self.use_camera:
                 # add camera pads
                 max_agg_bodies += len(self.fixed_camera_ids)
@@ -460,13 +466,13 @@ class Grasp(VecTask):
                     self.distractor_object_indices.append(object_idx)
                 self.distractor_object_fns.append(env_distractor_object_fns)
 
-            if fixed_box_asset is not None:
+            if fixed_box_assets:
                 box_indices = []
-                for box_index, position in enumerate(fixed_box_positions):
+                for box_index, (position, asset) in enumerate(zip(fixed_box_positions, fixed_box_assets)):
                     pose = gymapi.Transform()
                     pose.p = gymapi.Vec3(*[float(value) for value in position])
                     box_handle = self.gym.create_actor(
-                        env_ptr, fixed_box_asset, pose, f"fixed_box_{box_index}", i, -1, 0
+                        env_ptr, asset, pose, f"fixed_box_{box_index}", i, -1, 0
                     )
                     box_indices.append(self.gym.get_actor_index(env_ptr, box_handle, gymapi.DOMAIN_SIM))
                 self.fixed_box_indices.append(box_indices)

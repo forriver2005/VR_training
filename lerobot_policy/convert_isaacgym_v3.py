@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 from pathlib import Path
 
@@ -12,16 +13,22 @@ from lerobot.datasets.lerobot_dataset import LeRobotDataset
 
 
 def main() -> None:
-    root = Path("data/isaacgym_trajectorysuccessful2_fr3_v3_box_20260927_raw").resolve()
-    manifest = Path("data/datasets/trajectorysuccessful2_fr3_v3_strict_friction12_20260927/meta/scenes.jsonl").resolve()
-    output = Path("data/datasets/trajectorysuccessful2_fr3_v3_isaacgym_box_20260927").resolve()
+    root = Path(os.environ.get(
+        "IGYM_RAW_ROOT", "data/isaacgym_trajectorysuccessful2_fr3_v3_box_collision_20260928_raw"
+    )).resolve()
+    manifest = Path(os.environ.get(
+        "IGYM_SOURCE_MANIFEST", "data/datasets/trajectorysuccessful2_fr3_v3_strict_friction12_20260927/meta/scenes.jsonl"
+    )).resolve()
+    output = Path(os.environ.get(
+        "IGYM_DATASET_ROOT", "data/datasets/trajectorysuccessful2_fr3_v3_isaacgym_box_collision_20260928"
+    )).resolve()
     if output.exists():
         shutil.rmtree(output)
     rows = {int(row["episode_index"]): row for row in
             (json.loads(line) for line in manifest.read_text().splitlines() if line.strip())}
     files = sorted(root.glob("episode_*.npz"))
-    if len(files) < 80:
-        raise RuntimeError(f"Expected at least 80 successful Isaac Gym episodes, found {len(files)}")
+    if not files:
+        raise RuntimeError("No physically successful Isaac Gym episodes were collected")
     features = {
         "observation.state": {"dtype": "float32", "shape": (8,), "names": [f"state_{i}" for i in range(8)]},
         "action": {"dtype": "float32", "shape": (8,), "names": [f"action_{i}" for i in range(8)]},
@@ -60,6 +67,8 @@ def main() -> None:
         "camera_resolution": [256, 256], "camera_features": ["observation.camera_1.rgb", "observation.camera_2.rgb"],
         "demo_grasp_modality": "eefpose+finger_position; no joint angles as policy input",
         "robot": "FR3V2 panda two-finger gripper; eef_link TCP", "static_box_geometry": True,
+        "box_assets": ["stack_box/box.urdf", "stack_box/box1.urdf", "stack_box/box2.urdf"],
+        "box_scene_offset_m": [0.61, 0.0, 0.0], "box_wall_collision": True,
         "contact_friction": {"static": 1.2, "dynamic": 1.0, "restitution": 0.0},
         "source_manifest": str(manifest), "successful_episode_count": len(files),
     }

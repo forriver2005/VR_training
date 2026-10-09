@@ -1,0 +1,1512 @@
+{
+  "selection_version": 2,
+  "raw_root": "/home/zhaolizhi/DexResearch/DemoGrasp/houshengyuan_data",
+  "selection_rule": "10 RGB-rendered physical successes from each of 10 scenes",
+  "success_thresholds": {
+    "max_xy_error_m": 0.027,
+    "max_z_error_m": 0.018,
+    "max_linear_speed_mps": 0.12
+  },
+  "trajectories": [
+    {
+      "source_file": "Trajectory_1.json",
+      "scene_index": 0,
+      "trajectory_id": 0,
+      "dataset_episode": 0,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.011364619247615337,
+        "z_delta_m": 0.06000187620520592,
+        "cube_a_height_m": 0.09400106221437454,
+        "cube_b_height_m": 0.033999186009168625,
+        "cube_a_speed_mps": 0.016742991283535957,
+        "cube_b_speed_mps": 0.001791720511391759
+      }
+    },
+    {
+      "source_file": "Trajectory_1.json",
+      "scene_index": 0,
+      "trajectory_id": 1,
+      "dataset_episode": 1,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.013893750496208668,
+        "z_delta_m": 0.06000310182571411,
+        "cube_a_height_m": 0.0940026119351387,
+        "cube_b_height_m": 0.03399951010942459,
+        "cube_a_speed_mps": 0.013402698561549187,
+        "cube_b_speed_mps": 0.0029721143655478954
+      }
+    },
+    {
+      "source_file": "Trajectory_1.json",
+      "scene_index": 0,
+      "trajectory_id": 2,
+      "dataset_episode": 2,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.01691482961177826,
+        "z_delta_m": 0.060003675520420074,
+        "cube_a_height_m": 0.09400240331888199,
+        "cube_b_height_m": 0.033998727798461914,
+        "cube_a_speed_mps": 0.015623251907527447,
+        "cube_b_speed_mps": 0.002745778765529394
+      }
+    },
+    {
+      "source_file": "Trajectory_1.json",
+      "scene_index": 0,
+      "trajectory_id": 3,
+      "dataset_episode": 3,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.018406325951218605,
+        "z_delta_m": 0.06000452861189842,
+        "cube_a_height_m": 0.09400305151939392,
+        "cube_b_height_m": 0.0339985229074955,
+        "cube_a_speed_mps": 0.016226503998041153,
+        "cube_b_speed_mps": 0.0029596732929348946
+      }
+    },
+    {
+      "source_file": "Trajectory_1.json",
+      "scene_index": 0,
+      "trajectory_id": 4,
+      "dataset_episode": 4,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.017527630552649498,
+        "z_delta_m": 0.0600002147257328,
+        "cube_a_height_m": 0.0939980149269104,
+        "cube_b_height_m": 0.0339978002011776,
+        "cube_a_speed_mps": 0.01461443118751049,
+        "cube_b_speed_mps": 0.004048667848110199
+      }
+    },
+    {
+      "source_file": "Trajectory_1.json",
+      "scene_index": 0,
+      "trajectory_id": 5,
+      "dataset_episode": 5,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.01346379891037941,
+        "z_delta_m": 0.06000795587897301,
+        "cube_a_height_m": 0.09400723874568939,
+        "cube_b_height_m": 0.033999282866716385,
+        "cube_a_speed_mps": 0.014496082440018654,
+        "cube_b_speed_mps": 0.001432139310054481
+      }
+    },
+    {
+      "source_file": "Trajectory_1.json",
+      "scene_index": 0,
+      "trajectory_id": 6,
+      "dataset_episode": 6,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.014548096805810928,
+        "z_delta_m": 0.060002800077199936,
+        "cube_a_height_m": 0.09400174766778946,
+        "cube_b_height_m": 0.03399894759058952,
+        "cube_a_speed_mps": 0.015615472570061684,
+        "cube_b_speed_mps": 0.00290157669223845
+      }
+    },
+    {
+      "source_file": "Trajectory_1.json",
+      "scene_index": 0,
+      "trajectory_id": 7,
+      "dataset_episode": 7,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.019814036786556244,
+        "z_delta_m": 0.06000133976340294,
+        "cube_a_height_m": 0.09399961680173874,
+        "cube_b_height_m": 0.0339982770383358,
+        "cube_a_speed_mps": 0.015802524983882904,
+        "cube_b_speed_mps": 0.003937532193958759
+      }
+    },
+    {
+      "source_file": "Trajectory_1.json",
+      "scene_index": 0,
+      "trajectory_id": 8,
+      "dataset_episode": 8,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.012938841246068478,
+        "z_delta_m": 0.060003552585840225,
+        "cube_a_height_m": 0.09400258213281631,
+        "cube_b_height_m": 0.03399902954697609,
+        "cube_a_speed_mps": 0.015282804146409035,
+        "cube_b_speed_mps": 0.002584736328572035
+      }
+    },
+    {
+      "source_file": "Trajectory_1.json",
+      "scene_index": 0,
+      "trajectory_id": 9,
+      "dataset_episode": 9,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.014703888446092606,
+        "z_delta_m": 0.060004495084285736,
+        "cube_a_height_m": 0.09400340914726257,
+        "cube_b_height_m": 0.03399891406297684,
+        "cube_a_speed_mps": 0.01556297019124031,
+        "cube_b_speed_mps": 0.0024694721214473248
+      }
+    },
+    {
+      "source_file": "Trajectory_2.json",
+      "scene_index": 1,
+      "trajectory_id": 0,
+      "dataset_episode": 10,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.02668813057243824,
+        "z_delta_m": 0.06363648176193237,
+        "cube_a_height_m": 0.0976358950138092,
+        "cube_b_height_m": 0.03399940952658653,
+        "cube_a_speed_mps": 0.004602339584380388,
+        "cube_b_speed_mps": 0.0029225884936749935
+      }
+    },
+    {
+      "source_file": "Trajectory_2.json",
+      "scene_index": 1,
+      "trajectory_id": 1,
+      "dataset_episode": 11,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.020701808854937553,
+        "z_delta_m": 0.06261736154556274,
+        "cube_a_height_m": 0.09683733433485031,
+        "cube_b_height_m": 0.03421996906399727,
+        "cube_a_speed_mps": 0.01175052672624588,
+        "cube_b_speed_mps": 0.01124630868434906
+      }
+    },
+    {
+      "source_file": "Trajectory_2.json",
+      "scene_index": 1,
+      "trajectory_id": 2,
+      "dataset_episode": 12,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.021067114546895027,
+        "z_delta_m": 0.060582809150218964,
+        "cube_a_height_m": 0.0953802838921547,
+        "cube_b_height_m": 0.03479747474193573,
+        "cube_a_speed_mps": 0.015564107336103916,
+        "cube_b_speed_mps": 0.01700914278626442
+      }
+    },
+    {
+      "source_file": "Trajectory_2.json",
+      "scene_index": 1,
+      "trajectory_id": 3,
+      "dataset_episode": 13,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.022710837423801422,
+        "z_delta_m": 0.060563839972019196,
+        "cube_a_height_m": 0.09527719020843506,
+        "cube_b_height_m": 0.03471335023641586,
+        "cube_a_speed_mps": 0.011060071177780628,
+        "cube_b_speed_mps": 0.01935407891869545
+      }
+    },
+    {
+      "source_file": "Trajectory_2.json",
+      "scene_index": 1,
+      "trajectory_id": 4,
+      "dataset_episode": 14,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.025345206260681152,
+        "z_delta_m": 0.06064625084400177,
+        "cube_a_height_m": 0.09491400420665741,
+        "cube_b_height_m": 0.03426775336265564,
+        "cube_a_speed_mps": 0.01304618176072836,
+        "cube_b_speed_mps": 0.02044501155614853
+      }
+    },
+    {
+      "source_file": "Trajectory_2.json",
+      "scene_index": 1,
+      "trajectory_id": 5,
+      "dataset_episode": 15,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.02252638153731823,
+        "z_delta_m": 0.06240053102374077,
+        "cube_a_height_m": 0.0963999554514885,
+        "cube_b_height_m": 0.033999424427747726,
+        "cube_a_speed_mps": 0.04117227718234062,
+        "cube_b_speed_mps": 0.008165836334228516
+      }
+    },
+    {
+      "source_file": "Trajectory_2.json",
+      "scene_index": 1,
+      "trajectory_id": 6,
+      "dataset_episode": 16,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.021152425557374954,
+        "z_delta_m": 0.06193935498595238,
+        "cube_a_height_m": 0.09608592092990875,
+        "cube_b_height_m": 0.034146565943956375,
+        "cube_a_speed_mps": 0.012683025561273098,
+        "cube_b_speed_mps": 0.010661392472684383
+      }
+    },
+    {
+      "source_file": "Trajectory_2.json",
+      "scene_index": 1,
+      "trajectory_id": 7,
+      "dataset_episode": 17,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.01772301271557808,
+        "z_delta_m": 0.06345248967409134,
+        "cube_a_height_m": 0.09767783433198929,
+        "cube_b_height_m": 0.03422534465789795,
+        "cube_a_speed_mps": 0.010163758881390095,
+        "cube_b_speed_mps": 0.01593952253460884
+      }
+    },
+    {
+      "source_file": "Trajectory_2.json",
+      "scene_index": 1,
+      "trajectory_id": 8,
+      "dataset_episode": 18,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.02217373065650463,
+        "z_delta_m": 0.06053461134433746,
+        "cube_a_height_m": 0.09523345530033112,
+        "cube_b_height_m": 0.03469884395599365,
+        "cube_a_speed_mps": 0.01509183645248413,
+        "cube_b_speed_mps": 0.01798061840236187
+      }
+    },
+    {
+      "source_file": "Trajectory_2.json",
+      "scene_index": 1,
+      "trajectory_id": 9,
+      "dataset_episode": 19,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.025340648368000984,
+        "z_delta_m": 0.06281501799821854,
+        "cube_a_height_m": 0.09681487828493118,
+        "cube_b_height_m": 0.033999860286712646,
+        "cube_a_speed_mps": 0.023743703961372375,
+        "cube_b_speed_mps": 0.006276360712945461
+      }
+    },
+    {
+      "source_file": "Trajectory_3.json",
+      "scene_index": 2,
+      "trajectory_id": 3,
+      "dataset_episode": 20,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.0231116134673357,
+        "z_delta_m": 0.06000237539410591,
+        "cube_a_height_m": 0.09400074928998947,
+        "cube_b_height_m": 0.03399837389588356,
+        "cube_a_speed_mps": 0.022901495918631554,
+        "cube_b_speed_mps": 0.0018578663002699614
+      }
+    },
+    {
+      "source_file": "Trajectory_3.json",
+      "scene_index": 2,
+      "trajectory_id": 5,
+      "dataset_episode": 21,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.02350611239671707,
+        "z_delta_m": 0.06000205874443054,
+        "cube_a_height_m": 0.09400056302547455,
+        "cube_b_height_m": 0.033998504281044006,
+        "cube_a_speed_mps": 0.02150573767721653,
+        "cube_b_speed_mps": 0.002126310020685196
+      }
+    },
+    {
+      "source_file": "Trajectory_3.json",
+      "scene_index": 2,
+      "trajectory_id": 6,
+      "dataset_episode": 22,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.021963469684123993,
+        "z_delta_m": 0.06000446528196335,
+        "cube_a_height_m": 0.09400301426649094,
+        "cube_b_height_m": 0.03399854898452759,
+        "cube_a_speed_mps": 0.022184327244758606,
+        "cube_b_speed_mps": 0.0028043489437550306
+      }
+    },
+    {
+      "source_file": "Trajectory_3.json",
+      "scene_index": 2,
+      "trajectory_id": 20,
+      "dataset_episode": 84,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.022617299109697342,
+        "z_delta_m": 0.06000112369656563,
+        "cube_a_height_m": 0.09399965405464172,
+        "cube_b_height_m": 0.033998530358076096,
+        "cube_a_speed_mps": 0.0209246464073658,
+        "cube_b_speed_mps": 0.0026056731585413218
+      }
+    },
+    {
+      "source_file": "Trajectory_3.json",
+      "scene_index": 2,
+      "trajectory_id": 26,
+      "dataset_episode": 85,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.02295282483100891,
+        "z_delta_m": 0.06000329181551933,
+        "cube_a_height_m": 0.09400219470262527,
+        "cube_b_height_m": 0.03399890288710594,
+        "cube_a_speed_mps": 0.022987453266978264,
+        "cube_b_speed_mps": 0.0017780610360205173
+      }
+    },
+    {
+      "source_file": "Trajectory_3.json",
+      "scene_index": 2,
+      "trajectory_id": 29,
+      "dataset_episode": 86,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.01932954601943493,
+        "z_delta_m": 0.06000084802508354,
+        "cube_a_height_m": 0.09399978816509247,
+        "cube_b_height_m": 0.033998940140008926,
+        "cube_a_speed_mps": 0.01713395304977894,
+        "cube_b_speed_mps": 0.003229508176445961
+      }
+    },
+    {
+      "source_file": "Trajectory_3.json",
+      "scene_index": 2,
+      "trajectory_id": 36,
+      "dataset_episode": 87,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.024088179692626,
+        "z_delta_m": 0.060005877166986465,
+        "cube_a_height_m": 0.09400548785924911,
+        "cube_b_height_m": 0.03399961069226265,
+        "cube_a_speed_mps": 0.016247130930423737,
+        "cube_b_speed_mps": 0.0010998572688549757
+      }
+    },
+    {
+      "source_file": "Trajectory_3.json",
+      "scene_index": 2,
+      "trajectory_id": 38,
+      "dataset_episode": 88,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.01829911582171917,
+        "z_delta_m": 0.06000109016895294,
+        "cube_a_height_m": 0.09399989247322083,
+        "cube_b_height_m": 0.03399880230426788,
+        "cube_a_speed_mps": 0.017339104786515236,
+        "cube_b_speed_mps": 0.003194068791344762
+      }
+    },
+    {
+      "source_file": "Trajectory_3.json",
+      "scene_index": 2,
+      "trajectory_id": 40,
+      "dataset_episode": 89,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.024872342124581337,
+        "z_delta_m": 0.060010068118572235,
+        "cube_a_height_m": 0.09400875121355057,
+        "cube_b_height_m": 0.03399868309497833,
+        "cube_a_speed_mps": 0.02379579097032547,
+        "cube_b_speed_mps": 0.007532666437327862
+      }
+    },
+    {
+      "source_file": "Trajectory_3.json",
+      "scene_index": 2,
+      "trajectory_id": 42,
+      "dataset_episode": 90,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.02069157175719738,
+        "z_delta_m": 0.06000174954533577,
+        "cube_a_height_m": 0.09400040656328201,
+        "cube_b_height_m": 0.03399865701794624,
+        "cube_a_speed_mps": 0.023032832890748978,
+        "cube_b_speed_mps": 0.002218926325440407
+      }
+    },
+    {
+      "source_file": "Trajectory_4.json",
+      "scene_index": 3,
+      "trajectory_id": 0,
+      "dataset_episode": 23,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.010006198659539223,
+        "z_delta_m": 0.060007739812135696,
+        "cube_a_height_m": 0.09400776028633118,
+        "cube_b_height_m": 0.03400002047419548,
+        "cube_a_speed_mps": 0.01337509322911501,
+        "cube_b_speed_mps": 0.002211498562246561
+      }
+    },
+    {
+      "source_file": "Trajectory_4.json",
+      "scene_index": 3,
+      "trajectory_id": 1,
+      "dataset_episode": 24,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.007399969268590212,
+        "z_delta_m": 0.06000911816954613,
+        "cube_a_height_m": 0.09400927275419235,
+        "cube_b_height_m": 0.034000154584646225,
+        "cube_a_speed_mps": 0.012275136075913906,
+        "cube_b_speed_mps": 0.001675114850513637
+      }
+    },
+    {
+      "source_file": "Trajectory_4.json",
+      "scene_index": 3,
+      "trajectory_id": 3,
+      "dataset_episode": 25,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.010113517753779888,
+        "z_delta_m": 0.060008008033037186,
+        "cube_a_height_m": 0.0940079391002655,
+        "cube_b_height_m": 0.03399993106722832,
+        "cube_a_speed_mps": 0.012572011910378933,
+        "cube_b_speed_mps": 0.002590357791632414
+      }
+    },
+    {
+      "source_file": "Trajectory_4.json",
+      "scene_index": 3,
+      "trajectory_id": 5,
+      "dataset_episode": 26,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.007010248489677906,
+        "z_delta_m": 0.06000528857111931,
+        "cube_a_height_m": 0.09400521963834763,
+        "cube_b_height_m": 0.03399993106722832,
+        "cube_a_speed_mps": 0.013830424286425114,
+        "cube_b_speed_mps": 0.0010273727821186185
+      }
+    },
+    {
+      "source_file": "Trajectory_4.json",
+      "scene_index": 3,
+      "trajectory_id": 6,
+      "dataset_episode": 27,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.008964203298091888,
+        "z_delta_m": 0.06000297889113426,
+        "cube_a_height_m": 0.09400280565023422,
+        "cube_b_height_m": 0.03399982675909996,
+        "cube_a_speed_mps": 0.013511414639651775,
+        "cube_b_speed_mps": 0.0009974874556064606
+      }
+    },
+    {
+      "source_file": "Trajectory_4.json",
+      "scene_index": 3,
+      "trajectory_id": 7,
+      "dataset_episode": 28,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.0053720916621387005,
+        "z_delta_m": 0.060006845742464066,
+        "cube_a_height_m": 0.09400679916143417,
+        "cube_b_height_m": 0.03399995341897011,
+        "cube_a_speed_mps": 0.012574142776429653,
+        "cube_b_speed_mps": 0.0017485130811110139
+      }
+    },
+    {
+      "source_file": "Trajectory_4.json",
+      "scene_index": 3,
+      "trajectory_id": 8,
+      "dataset_episode": 29,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.010676194913685322,
+        "z_delta_m": 0.06001250073313713,
+        "cube_a_height_m": 0.09401247650384903,
+        "cube_b_height_m": 0.0339999757707119,
+        "cube_a_speed_mps": 0.013753319159150124,
+        "cube_b_speed_mps": 0.0014901503454893827
+      }
+    },
+    {
+      "source_file": "Trajectory_4.json",
+      "scene_index": 3,
+      "trajectory_id": 10,
+      "dataset_episode": 77,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.009531388059258461,
+        "z_delta_m": 0.06000228598713875,
+        "cube_a_height_m": 0.09400194138288498,
+        "cube_b_height_m": 0.03399965539574623,
+        "cube_a_speed_mps": 0.013648100197315216,
+        "cube_b_speed_mps": 0.0011502305278554559
+      }
+    },
+    {
+      "source_file": "Trajectory_4.json",
+      "scene_index": 3,
+      "trajectory_id": 11,
+      "dataset_episode": 78,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.00624604057520628,
+        "z_delta_m": 0.06000173091888428,
+        "cube_a_height_m": 0.09400191158056259,
+        "cube_b_height_m": 0.034000180661678314,
+        "cube_a_speed_mps": 0.011855150572955608,
+        "cube_b_speed_mps": 0.0005288766697049141
+      }
+    },
+    {
+      "source_file": "Trajectory_4.json",
+      "scene_index": 3,
+      "trajectory_id": 12,
+      "dataset_episode": 79,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.006897063925862312,
+        "z_delta_m": 0.06000421196222305,
+        "cube_a_height_m": 0.09400434792041779,
+        "cube_b_height_m": 0.03400013595819473,
+        "cube_a_speed_mps": 0.01190265268087387,
+        "cube_b_speed_mps": 0.00209121685475111
+      }
+    },
+    {
+      "source_file": "Trajectory_5.json",
+      "scene_index": 4,
+      "trajectory_id": 0,
+      "dataset_episode": 30,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.012238794937729836,
+        "z_delta_m": 0.06000076234340668,
+        "cube_a_height_m": 0.09400098770856857,
+        "cube_b_height_m": 0.034000225365161896,
+        "cube_a_speed_mps": 0.01367628201842308,
+        "cube_b_speed_mps": 0.001568498439155519
+      }
+    },
+    {
+      "source_file": "Trajectory_5.json",
+      "scene_index": 4,
+      "trajectory_id": 1,
+      "dataset_episode": 31,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.007852789014577866,
+        "z_delta_m": 0.06000621244311333,
+        "cube_a_height_m": 0.09400643408298492,
+        "cube_b_height_m": 0.0340002216398716,
+        "cube_a_speed_mps": 0.011159664951264858,
+        "cube_b_speed_mps": 0.0009864295134320855
+      }
+    },
+    {
+      "source_file": "Trajectory_5.json",
+      "scene_index": 4,
+      "trajectory_id": 2,
+      "dataset_episode": 32,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.01901674084365368,
+        "z_delta_m": 0.060002461075782776,
+        "cube_a_height_m": 0.09400176256895065,
+        "cube_b_height_m": 0.03399930149316788,
+        "cube_a_speed_mps": 0.0150145860388875,
+        "cube_b_speed_mps": 0.0028550263959914446
+      }
+    },
+    {
+      "source_file": "Trajectory_5.json",
+      "scene_index": 4,
+      "trajectory_id": 3,
+      "dataset_episode": 33,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.009472984820604324,
+        "z_delta_m": 0.060002341866493225,
+        "cube_a_height_m": 0.09400171786546707,
+        "cube_b_height_m": 0.033999375998973846,
+        "cube_a_speed_mps": 0.014627913013100624,
+        "cube_b_speed_mps": 0.0023272393736988306
+      }
+    },
+    {
+      "source_file": "Trajectory_5.json",
+      "scene_index": 4,
+      "trajectory_id": 4,
+      "dataset_episode": 34,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.00902008730918169,
+        "z_delta_m": 0.06000065430998802,
+        "cube_a_height_m": 0.09400032460689545,
+        "cube_b_height_m": 0.033999670296907425,
+        "cube_a_speed_mps": 0.014637187123298645,
+        "cube_b_speed_mps": 0.002447635168209672
+      }
+    },
+    {
+      "source_file": "Trajectory_5.json",
+      "scene_index": 4,
+      "trajectory_id": 5,
+      "dataset_episode": 35,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.006864794064313173,
+        "z_delta_m": 0.06000213325023651,
+        "cube_a_height_m": 0.09400312602519989,
+        "cube_b_height_m": 0.03400099277496338,
+        "cube_a_speed_mps": 0.012836762703955173,
+        "cube_b_speed_mps": 0.0009722984977997839
+      }
+    },
+    {
+      "source_file": "Trajectory_5.json",
+      "scene_index": 4,
+      "trajectory_id": 6,
+      "dataset_episode": 36,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.016864851117134094,
+        "z_delta_m": 0.06000344827771187,
+        "cube_a_height_m": 0.0940023884177208,
+        "cube_b_height_m": 0.033998940140008926,
+        "cube_a_speed_mps": 0.01858680695295334,
+        "cube_b_speed_mps": 0.00233915145508945
+      }
+    },
+    {
+      "source_file": "Trajectory_5.json",
+      "scene_index": 4,
+      "trajectory_id": 7,
+      "dataset_episode": 37,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.0024131103418767452,
+        "z_delta_m": 0.06000543758273125,
+        "cube_a_height_m": 0.09400569647550583,
+        "cube_b_height_m": 0.03400025889277458,
+        "cube_a_speed_mps": 0.0141423549503088,
+        "cube_b_speed_mps": 0.0009211789583787322
+      }
+    },
+    {
+      "source_file": "Trajectory_5.json",
+      "scene_index": 4,
+      "trajectory_id": 8,
+      "dataset_episode": 38,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.002548566088080406,
+        "z_delta_m": 0.060005977749824524,
+        "cube_a_height_m": 0.09400603920221329,
+        "cube_b_height_m": 0.03400006145238876,
+        "cube_a_speed_mps": 0.014173919335007668,
+        "cube_b_speed_mps": 0.0011713989078998566
+      }
+    },
+    {
+      "source_file": "Trajectory_5.json",
+      "scene_index": 4,
+      "trajectory_id": 9,
+      "dataset_episode": 39,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.01104158628731966,
+        "z_delta_m": 0.06000177189707756,
+        "cube_a_height_m": 0.094000905752182,
+        "cube_b_height_m": 0.033999133855104446,
+        "cube_a_speed_mps": 0.013968029990792274,
+        "cube_b_speed_mps": 0.0028001570608466864
+      }
+    },
+    {
+      "source_file": "Trajectory_6.json",
+      "scene_index": 5,
+      "trajectory_id": 0,
+      "dataset_episode": 40,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.005590587388724089,
+        "z_delta_m": 0.06000542268157005,
+        "cube_a_height_m": 0.09400597214698792,
+        "cube_b_height_m": 0.03400054946541786,
+        "cube_a_speed_mps": 0.01312119048088789,
+        "cube_b_speed_mps": 0.001380300265736878
+      }
+    },
+    {
+      "source_file": "Trajectory_6.json",
+      "scene_index": 5,
+      "trajectory_id": 1,
+      "dataset_episode": 41,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.008176937699317932,
+        "z_delta_m": 0.060008540749549866,
+        "cube_a_height_m": 0.09400846809148788,
+        "cube_b_height_m": 0.03399992734193802,
+        "cube_a_speed_mps": 0.01374335028231144,
+        "cube_b_speed_mps": 0.001773942494764924
+      }
+    },
+    {
+      "source_file": "Trajectory_6.json",
+      "scene_index": 5,
+      "trajectory_id": 2,
+      "dataset_episode": 42,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.005043473560363054,
+        "z_delta_m": 0.06000711768865585,
+        "cube_a_height_m": 0.09400759637355804,
+        "cube_b_height_m": 0.03400047868490219,
+        "cube_a_speed_mps": 0.010035722516477108,
+        "cube_b_speed_mps": 0.0009309252491220832
+      }
+    },
+    {
+      "source_file": "Trajectory_6.json",
+      "scene_index": 5,
+      "trajectory_id": 3,
+      "dataset_episode": 43,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.0029773670248687267,
+        "z_delta_m": 0.06000608205795288,
+        "cube_a_height_m": 0.09400635957717896,
+        "cube_b_height_m": 0.034000277519226074,
+        "cube_a_speed_mps": 0.013604788109660149,
+        "cube_b_speed_mps": 0.0012493300018832088
+      }
+    },
+    {
+      "source_file": "Trajectory_6.json",
+      "scene_index": 5,
+      "trajectory_id": 4,
+      "dataset_episode": 44,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.008079941384494305,
+        "z_delta_m": 0.06000588834285736,
+        "cube_a_height_m": 0.09400591999292374,
+        "cube_b_height_m": 0.034000031650066376,
+        "cube_a_speed_mps": 0.012309649959206581,
+        "cube_b_speed_mps": 0.0026606188621371984
+      }
+    },
+    {
+      "source_file": "Trajectory_6.json",
+      "scene_index": 5,
+      "trajectory_id": 5,
+      "dataset_episode": 45,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.005174126476049423,
+        "z_delta_m": 0.06000133976340294,
+        "cube_a_height_m": 0.09400118142366409,
+        "cube_b_height_m": 0.033999841660261154,
+        "cube_a_speed_mps": 0.012338737957179546,
+        "cube_b_speed_mps": 0.0013153288746252656
+      }
+    },
+    {
+      "source_file": "Trajectory_6.json",
+      "scene_index": 5,
+      "trajectory_id": 6,
+      "dataset_episode": 46,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.007041523698717356,
+        "z_delta_m": 0.060004640370607376,
+        "cube_a_height_m": 0.09400483965873718,
+        "cube_b_height_m": 0.034000199288129807,
+        "cube_a_speed_mps": 0.013089306652545929,
+        "cube_b_speed_mps": 0.000845086295157671
+      }
+    },
+    {
+      "source_file": "Trajectory_6.json",
+      "scene_index": 5,
+      "trajectory_id": 7,
+      "dataset_episode": 47,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.007574575021862984,
+        "z_delta_m": 0.060004495084285736,
+        "cube_a_height_m": 0.09400468319654465,
+        "cube_b_height_m": 0.03400018811225891,
+        "cube_a_speed_mps": 0.013032495975494385,
+        "cube_b_speed_mps": 0.0008737419848330319
+      }
+    },
+    {
+      "source_file": "Trajectory_6.json",
+      "scene_index": 5,
+      "trajectory_id": 9,
+      "dataset_episode": 48,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.009523329325020313,
+        "z_delta_m": 0.059997398406267166,
+        "cube_a_height_m": 0.09399685263633728,
+        "cube_b_height_m": 0.033999454230070114,
+        "cube_a_speed_mps": 0.010283728130161762,
+        "cube_b_speed_mps": 0.0027117100544273853
+      }
+    },
+    {
+      "source_file": "Trajectory_6.json",
+      "scene_index": 5,
+      "trajectory_id": 10,
+      "dataset_episode": 80,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.008584007620811462,
+        "z_delta_m": 0.0600096620619297,
+        "cube_a_height_m": 0.09400968998670578,
+        "cube_b_height_m": 0.03400002792477608,
+        "cube_a_speed_mps": 0.013170762918889523,
+        "cube_b_speed_mps": 0.002571194665506482
+      }
+    },
+    {
+      "source_file": "Trajectory_7.json",
+      "scene_index": 6,
+      "trajectory_id": 0,
+      "dataset_episode": 49,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.011772489175200462,
+        "z_delta_m": 0.06000041216611862,
+        "cube_a_height_m": 0.0939997062087059,
+        "cube_b_height_m": 0.03399929404258728,
+        "cube_a_speed_mps": 0.014326469972729683,
+        "cube_b_speed_mps": 0.002759720664471388
+      }
+    },
+    {
+      "source_file": "Trajectory_7.json",
+      "scene_index": 6,
+      "trajectory_id": 1,
+      "dataset_episode": 50,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.01733463443815708,
+        "z_delta_m": 0.06000002101063728,
+        "cube_a_height_m": 0.09399829804897308,
+        "cube_b_height_m": 0.0339982770383358,
+        "cube_a_speed_mps": 0.014277966693043709,
+        "cube_b_speed_mps": 0.0037914193235337734
+      }
+    },
+    {
+      "source_file": "Trajectory_7.json",
+      "scene_index": 6,
+      "trajectory_id": 3,
+      "dataset_episode": 51,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.014603991992771626,
+        "z_delta_m": 0.06000395864248276,
+        "cube_a_height_m": 0.09400284290313721,
+        "cube_b_height_m": 0.03399888426065445,
+        "cube_a_speed_mps": 0.01529941987246275,
+        "cube_b_speed_mps": 0.0025584509130567312
+      }
+    },
+    {
+      "source_file": "Trajectory_7.json",
+      "scene_index": 6,
+      "trajectory_id": 5,
+      "dataset_episode": 52,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.012329076416790485,
+        "z_delta_m": 0.06000245362520218,
+        "cube_a_height_m": 0.09400220960378647,
+        "cube_b_height_m": 0.03399975597858429,
+        "cube_a_speed_mps": 0.014003043062984943,
+        "cube_b_speed_mps": 0.0026101155672222376
+      }
+    },
+    {
+      "source_file": "Trajectory_7.json",
+      "scene_index": 6,
+      "trajectory_id": 7,
+      "dataset_episode": 53,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.021150201559066772,
+        "z_delta_m": 0.06000056117773056,
+        "cube_a_height_m": 0.09399887174367905,
+        "cube_b_height_m": 0.033998310565948486,
+        "cube_a_speed_mps": 0.015403488650918007,
+        "cube_b_speed_mps": 0.003986938390880823
+      }
+    },
+    {
+      "source_file": "Trajectory_7.json",
+      "scene_index": 6,
+      "trajectory_id": 8,
+      "dataset_episode": 54,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.010864898562431335,
+        "z_delta_m": 0.059999458491802216,
+        "cube_a_height_m": 0.09399878978729248,
+        "cube_b_height_m": 0.033999331295490265,
+        "cube_a_speed_mps": 0.010733221657574177,
+        "cube_b_speed_mps": 0.001908896490931511
+      }
+    },
+    {
+      "source_file": "Trajectory_7.json",
+      "scene_index": 6,
+      "trajectory_id": 9,
+      "dataset_episode": 55,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.015692511573433876,
+        "z_delta_m": 0.06000247970223427,
+        "cube_a_height_m": 0.09400168806314468,
+        "cube_b_height_m": 0.033999208360910416,
+        "cube_a_speed_mps": 0.013244801200926304,
+        "cube_b_speed_mps": 0.003285045735538006
+      }
+    },
+    {
+      "source_file": "Trajectory_7.json",
+      "scene_index": 6,
+      "trajectory_id": 12,
+      "dataset_episode": 81,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.015407283790409565,
+        "z_delta_m": 0.06000285968184471,
+        "cube_a_height_m": 0.0940016657114029,
+        "cube_b_height_m": 0.03399880602955818,
+        "cube_a_speed_mps": 0.015248645097017288,
+        "cube_b_speed_mps": 0.0029113581404089928
+      }
+    },
+    {
+      "source_file": "Trajectory_7.json",
+      "scene_index": 6,
+      "trajectory_id": 15,
+      "dataset_episode": 82,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.009493435733020306,
+        "z_delta_m": 0.060004692524671555,
+        "cube_a_height_m": 0.09400441497564316,
+        "cube_b_height_m": 0.0339997224509716,
+        "cube_a_speed_mps": 0.012131381779909134,
+        "cube_b_speed_mps": 0.0022725898306816816
+      }
+    },
+    {
+      "source_file": "Trajectory_7.json",
+      "scene_index": 6,
+      "trajectory_id": 16,
+      "dataset_episode": 83,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.022301876917481422,
+        "z_delta_m": 0.060001738369464874,
+        "cube_a_height_m": 0.09399979561567307,
+        "cube_b_height_m": 0.03399805724620819,
+        "cube_a_speed_mps": 0.015877898782491684,
+        "cube_b_speed_mps": 0.004215507302433252
+      }
+    },
+    {
+      "source_file": "Trajectory_8.json",
+      "scene_index": 7,
+      "trajectory_id": 0,
+      "dataset_episode": 56,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.01184501126408577,
+        "z_delta_m": 0.06028719246387482,
+        "cube_a_height_m": 0.09428705275058746,
+        "cube_b_height_m": 0.033999860286712646,
+        "cube_a_speed_mps": 0.012213501147925854,
+        "cube_b_speed_mps": 0.005079047754406929
+      }
+    },
+    {
+      "source_file": "Trajectory_8.json",
+      "scene_index": 7,
+      "trajectory_id": 1,
+      "dataset_episode": 57,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.009555443190038204,
+        "z_delta_m": 0.0603049099445343,
+        "cube_a_height_m": 0.09430471807718277,
+        "cube_b_height_m": 0.03399980813264847,
+        "cube_a_speed_mps": 0.011319054290652275,
+        "cube_b_speed_mps": 0.004774168133735657
+      }
+    },
+    {
+      "source_file": "Trajectory_8.json",
+      "scene_index": 7,
+      "trajectory_id": 2,
+      "dataset_episode": 58,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.014750631526112556,
+        "z_delta_m": 0.060313235968351364,
+        "cube_a_height_m": 0.09431348741054535,
+        "cube_b_height_m": 0.034000251442193985,
+        "cube_a_speed_mps": 0.005988176446408033,
+        "cube_b_speed_mps": 0.004106445237994194
+      }
+    },
+    {
+      "source_file": "Trajectory_8.json",
+      "scene_index": 7,
+      "trajectory_id": 3,
+      "dataset_episode": 59,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.0054744817316532135,
+        "z_delta_m": 0.060299262404441833,
+        "cube_a_height_m": 0.09429862350225449,
+        "cube_b_height_m": 0.03399936109781265,
+        "cube_a_speed_mps": 0.016281278803944588,
+        "cube_b_speed_mps": 0.005794862750917673
+      }
+    },
+    {
+      "source_file": "Trajectory_8.json",
+      "scene_index": 7,
+      "trajectory_id": 4,
+      "dataset_episode": 60,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.008829189464449883,
+        "z_delta_m": 0.060296498239040375,
+        "cube_a_height_m": 0.0942964032292366,
+        "cube_b_height_m": 0.03399990499019623,
+        "cube_a_speed_mps": 0.02388281747698784,
+        "cube_b_speed_mps": 0.00702060479670763
+      }
+    },
+    {
+      "source_file": "Trajectory_8.json",
+      "scene_index": 7,
+      "trajectory_id": 5,
+      "dataset_episode": 61,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.005216080229729414,
+        "z_delta_m": 0.06040484458208084,
+        "cube_a_height_m": 0.09440552443265915,
+        "cube_b_height_m": 0.03400067985057831,
+        "cube_a_speed_mps": 0.012959285639226437,
+        "cube_b_speed_mps": 0.005530187394469976
+      }
+    },
+    {
+      "source_file": "Trajectory_8.json",
+      "scene_index": 7,
+      "trajectory_id": 6,
+      "dataset_episode": 62,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.00960539374500513,
+        "z_delta_m": 0.060306672006845474,
+        "cube_a_height_m": 0.094306081533432,
+        "cube_b_height_m": 0.03399940952658653,
+        "cube_a_speed_mps": 0.016268206760287285,
+        "cube_b_speed_mps": 0.005569580942392349
+      }
+    },
+    {
+      "source_file": "Trajectory_8.json",
+      "scene_index": 7,
+      "trajectory_id": 7,
+      "dataset_episode": 63,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.00823105126619339,
+        "z_delta_m": 0.06032516062259674,
+        "cube_a_height_m": 0.09432900696992874,
+        "cube_b_height_m": 0.034003846347332,
+        "cube_a_speed_mps": 0.0157814621925354,
+        "cube_b_speed_mps": 0.006148901302367449
+      }
+    },
+    {
+      "source_file": "Trajectory_8.json",
+      "scene_index": 7,
+      "trajectory_id": 8,
+      "dataset_episode": 64,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.010561609640717506,
+        "z_delta_m": 0.060374729335308075,
+        "cube_a_height_m": 0.09437446296215057,
+        "cube_b_height_m": 0.0339997336268425,
+        "cube_a_speed_mps": 0.013250904157757759,
+        "cube_b_speed_mps": 0.005268515553325415
+      }
+    },
+    {
+      "source_file": "Trajectory_8.json",
+      "scene_index": 7,
+      "trajectory_id": 9,
+      "dataset_episode": 65,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.013403777964413166,
+        "z_delta_m": 0.06026989594101906,
+        "cube_a_height_m": 0.09426957368850708,
+        "cube_b_height_m": 0.03399967774748802,
+        "cube_a_speed_mps": 0.007636483758687973,
+        "cube_b_speed_mps": 0.004870827309787273
+      }
+    },
+    {
+      "source_file": "Trajectory_9.json",
+      "scene_index": 8,
+      "trajectory_id": 0,
+      "dataset_episode": 66,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.022000795230269432,
+        "z_delta_m": 0.06000354513525963,
+        "cube_a_height_m": 0.09400181472301483,
+        "cube_b_height_m": 0.0339982695877552,
+        "cube_a_speed_mps": 0.015921548008918762,
+        "cube_b_speed_mps": 0.003292490728199482
+      }
+    },
+    {
+      "source_file": "Trajectory_9.json",
+      "scene_index": 8,
+      "trajectory_id": 1,
+      "dataset_episode": 67,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.01597495563328266,
+        "z_delta_m": 0.060011837631464005,
+        "cube_a_height_m": 0.09401104599237442,
+        "cube_b_height_m": 0.033999208360910416,
+        "cube_a_speed_mps": 0.01492306962609291,
+        "cube_b_speed_mps": 0.0017566826427355409
+      }
+    },
+    {
+      "source_file": "Trajectory_9.json",
+      "scene_index": 8,
+      "trajectory_id": 2,
+      "dataset_episode": 68,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.02127104438841343,
+        "z_delta_m": 0.06002464145421982,
+        "cube_a_height_m": 0.09402468800544739,
+        "cube_b_height_m": 0.03400004655122757,
+        "cube_a_speed_mps": 0.01352602243423462,
+        "cube_b_speed_mps": 0.004789373837411404
+      }
+    },
+    {
+      "source_file": "Trajectory_9.json",
+      "scene_index": 8,
+      "trajectory_id": 3,
+      "dataset_episode": 69,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.023418894037604332,
+        "z_delta_m": 0.060001105070114136,
+        "cube_a_height_m": 0.09399926662445068,
+        "cube_b_height_m": 0.03399816155433655,
+        "cube_a_speed_mps": 0.015261620283126831,
+        "cube_b_speed_mps": 0.004414050839841366
+      }
+    },
+    {
+      "source_file": "Trajectory_9.json",
+      "scene_index": 8,
+      "trajectory_id": 4,
+      "dataset_episode": 70,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.019958296790719032,
+        "z_delta_m": 0.060000982135534286,
+        "cube_a_height_m": 0.09399931132793427,
+        "cube_b_height_m": 0.03399832919239998,
+        "cube_a_speed_mps": 0.016154589131474495,
+        "cube_b_speed_mps": 0.004025206435471773
+      }
+    },
+    {
+      "source_file": "Trajectory_9.json",
+      "scene_index": 8,
+      "trajectory_id": 5,
+      "dataset_episode": 71,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.020330507308244705,
+        "z_delta_m": 0.06000988185405731,
+        "cube_a_height_m": 0.09400873631238937,
+        "cube_b_height_m": 0.03399885445833206,
+        "cube_a_speed_mps": 0.014253821223974228,
+        "cube_b_speed_mps": 0.0016241155099123716
+      }
+    },
+    {
+      "source_file": "Trajectory_9.json",
+      "scene_index": 8,
+      "trajectory_id": 6,
+      "dataset_episode": 72,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.023834027349948883,
+        "z_delta_m": 0.060025379061698914,
+        "cube_a_height_m": 0.09402549266815186,
+        "cube_b_height_m": 0.03400011360645294,
+        "cube_a_speed_mps": 0.013898948207497597,
+        "cube_b_speed_mps": 0.005317368544638157
+      }
+    },
+    {
+      "source_file": "Trajectory_9.json",
+      "scene_index": 8,
+      "trajectory_id": 7,
+      "dataset_episode": 73,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.014746082946658134,
+        "z_delta_m": 0.06000566855072975,
+        "cube_a_height_m": 0.09400524944067001,
+        "cube_b_height_m": 0.03399958088994026,
+        "cube_a_speed_mps": 0.014000960625708103,
+        "cube_b_speed_mps": 0.001228532288223505
+      }
+    },
+    {
+      "source_file": "Trajectory_9.json",
+      "scene_index": 8,
+      "trajectory_id": 8,
+      "dataset_episode": 74,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.021212909370660782,
+        "z_delta_m": 0.06000426039099693,
+        "cube_a_height_m": 0.0940026193857193,
+        "cube_b_height_m": 0.033998358994722366,
+        "cube_a_speed_mps": 0.015824057161808014,
+        "cube_b_speed_mps": 0.003000060562044382
+      }
+    },
+    {
+      "source_file": "Trajectory_9.json",
+      "scene_index": 8,
+      "trajectory_id": 9,
+      "dataset_episode": 75,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.017544729635119438,
+        "z_delta_m": 0.06000534072518349,
+        "cube_a_height_m": 0.09400402009487152,
+        "cube_b_height_m": 0.033998679369688034,
+        "cube_a_speed_mps": 0.01571296900510788,
+        "cube_b_speed_mps": 0.0025062731001526117
+      }
+    },
+    {
+      "source_file": "Trajectory_10.json",
+      "scene_index": 9,
+      "trajectory_id": 1,
+      "dataset_episode": 76,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.019471945241093636,
+        "z_delta_m": 0.06000301241874695,
+        "cube_a_height_m": 0.09400171786546707,
+        "cube_b_height_m": 0.03399870544672012,
+        "cube_a_speed_mps": 0.021617870777845383,
+        "cube_b_speed_mps": 0.0028052120469510555
+      }
+    },
+    {
+      "source_file": "Trajectory_10.json",
+      "scene_index": 9,
+      "trajectory_id": 43,
+      "dataset_episode": 91,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.022014431655406952,
+        "z_delta_m": 0.06000430881977081,
+        "cube_a_height_m": 0.09400292485952377,
+        "cube_b_height_m": 0.03399861603975296,
+        "cube_a_speed_mps": 0.02413189597427845,
+        "cube_b_speed_mps": 0.003060383489355445
+      }
+    },
+    {
+      "source_file": "Trajectory_10.json",
+      "scene_index": 9,
+      "trajectory_id": 45,
+      "dataset_episode": 92,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.016859250143170357,
+        "z_delta_m": 0.06000261381268501,
+        "cube_a_height_m": 0.09400156140327454,
+        "cube_b_height_m": 0.03399894759058952,
+        "cube_a_speed_mps": 0.017707418650388718,
+        "cube_b_speed_mps": 0.002765437588095665
+      }
+    },
+    {
+      "source_file": "Trajectory_10.json",
+      "scene_index": 9,
+      "trajectory_id": 54,
+      "dataset_episode": 93,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.01793334260582924,
+        "z_delta_m": 0.060003045946359634,
+        "cube_a_height_m": 0.09400184452533722,
+        "cube_b_height_m": 0.033998798578977585,
+        "cube_a_speed_mps": 0.019519396126270294,
+        "cube_b_speed_mps": 0.0029358656611293554
+      }
+    },
+    {
+      "source_file": "Trajectory_10.json",
+      "scene_index": 9,
+      "trajectory_id": 56,
+      "dataset_episode": 94,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.02420227788388729,
+        "z_delta_m": 0.06001082807779312,
+        "cube_a_height_m": 0.09400956332683563,
+        "cube_b_height_m": 0.03399873524904251,
+        "cube_a_speed_mps": 0.022853191941976547,
+        "cube_b_speed_mps": 0.007673539686948061
+      }
+    },
+    {
+      "source_file": "Trajectory_10.json",
+      "scene_index": 9,
+      "trajectory_id": 62,
+      "dataset_episode": 95,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.025406844913959503,
+        "z_delta_m": 0.060006216168403625,
+        "cube_a_height_m": 0.09400492906570435,
+        "cube_b_height_m": 0.03399871289730072,
+        "cube_a_speed_mps": 0.02678055316209793,
+        "cube_b_speed_mps": 0.005606706254184246
+      }
+    },
+    {
+      "source_file": "Trajectory_10.json",
+      "scene_index": 9,
+      "trajectory_id": 65,
+      "dataset_episode": 96,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.0188489630818367,
+        "z_delta_m": 0.06000819057226181,
+        "cube_a_height_m": 0.09400716423988342,
+        "cube_b_height_m": 0.03399897366762161,
+        "cube_a_speed_mps": 0.019895657896995544,
+        "cube_b_speed_mps": 0.002026442438364029
+      }
+    },
+    {
+      "source_file": "Trajectory_10.json",
+      "scene_index": 9,
+      "trajectory_id": 67,
+      "dataset_episode": 97,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.016352444887161255,
+        "z_delta_m": 0.060003891587257385,
+        "cube_a_height_m": 0.09400290250778198,
+        "cube_b_height_m": 0.0339990109205246,
+        "cube_a_speed_mps": 0.018176516517996788,
+        "cube_b_speed_mps": 0.0027587255463004112
+      }
+    },
+    {
+      "source_file": "Trajectory_10.json",
+      "scene_index": 9,
+      "trajectory_id": 68,
+      "dataset_episode": 98,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.019603051245212555,
+        "z_delta_m": 0.06000329554080963,
+        "cube_a_height_m": 0.09400191903114319,
+        "cube_b_height_m": 0.03399862349033356,
+        "cube_a_speed_mps": 0.02031208761036396,
+        "cube_b_speed_mps": 0.002097412943840027
+      }
+    },
+    {
+      "source_file": "Trajectory_10.json",
+      "scene_index": 9,
+      "trajectory_id": 70,
+      "dataset_episode": 99,
+      "replay_metrics": {
+        "success": true,
+        "xy_error_m": 0.023445647209882736,
+        "z_delta_m": 0.06000487133860588,
+        "cube_a_height_m": 0.09400364756584167,
+        "cube_b_height_m": 0.033998776227235794,
+        "cube_a_speed_mps": 0.024481425061821938,
+        "cube_b_speed_mps": 0.004333381075412035
+      }
+    }
+  ]
+}

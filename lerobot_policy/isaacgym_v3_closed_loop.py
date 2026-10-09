@@ -22,6 +22,7 @@ from isaacgymenvs.utils.utils import set_np_formatting, set_seed
 from omegaconf import OmegaConf, open_dict
 
 ROOT = Path(__file__).resolve().parents[1]
+SCENE_OFFSET = np.array([0.61, 0.0, 0.0], dtype=np.float32)
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 import isaacgymenvs
@@ -70,6 +71,9 @@ def configure(cfg) -> None:
         cfg.task.env.asset.distractorObjectAssetFile = "stack_cube/cube_b.urdf"
         cfg.task.env.asset.useFixedBoxObstacles = True
         cfg.task.env.asset.fixedBoxAssetFile = "stack_box/box.urdf"
+        cfg.task.env.asset.fixedBoxAssetFiles = [
+            "stack_box/box.urdf", "stack_box/box1.urdf", "stack_box/box2.urdf"
+        ]
         cfg.task.env.asset.fixedBoxDefaultPositions = [[0.0, 0.0, 0.005]] * 3
         cfg.task.env.render.enable = True
         cfg.task.env.enableCameraSensors = True
@@ -79,7 +83,7 @@ def configure(cfg) -> None:
         cfg.task.env.render.data_type = "rgb"
         cfg.task.env.render.resize = [256, 256]
         cfg.force_render = True
-        cfg.headless = True
+        cfg.headless = bool(cfg.get("v3_headless", True))
 
 
 def create_env(cfg):
@@ -93,7 +97,7 @@ def set_scene(env, row: dict) -> None:
     env.reset_idx(env_ids)
     # v3 source coordinates use the FR3 base frame. Isaac Gym's stack task uses
     # the same table frame offset as the original ACT collection.
-    offset = np.array([0.61, 0.0, 0.0], dtype=np.float32)
+    offset = SCENE_OFFSET
     a = np.asarray(row["cube_a_initial_xyz"], dtype=np.float32) + offset
     b = np.asarray(row["cube_b_initial_xyz"], dtype=np.float32) + offset
     object_index = env.object_indices[0]
@@ -109,17 +113,28 @@ def set_scene(env, row: dict) -> None:
     box_positions = [row["boxes"][f"box{i}"]["position"] for i in (1, 2, 3)]
     box_indices = []
     for box_index, position in zip(env.fixed_box_indices[0], box_positions):
-        # Box transforms are authored in the Isaac scene/world frame, unlike
-        # cube and EEF telemetry which use the FR3 base frame.
-        world_position = np.asarray(position, dtype=np.float32)
+        # Move the entire source scene into the Gym table frame together.
+        world_position = np.asarray(position, dtype=np.float32) + offset
         env.root_state_tensor[box_index, :3] = torch.from_numpy(world_position).to(env.device)
-        env.root_state_tensor[box_index, 3:7] = quat
+        box_name = f"box{len(box_indices) + 1}"
+        env.root_state_tensor[box_index, 3:7] = torch.tensor(
+            row["boxes"][box_name]["rotation"], device=env.device)
         env.root_state_tensor[box_index, 7:] = 0.0
         box_indices.append(box_index)
     if box_indices:
         indices = torch.cat([indices, torch.tensor(box_indices, dtype=torch.int32, device=env.device)])
     env.gym.set_actor_root_state_tensor_indexed(env.sim, gymtorch.unwrap_tensor(env.root_state_tensor),
                                                 gymtorch.unwrap_tensor(indices), len(indices))
+    # reset_idx writes robot DOF targets, but the GPU pipeline applies them on
+    # the next simulation step. Settle before the first observation so episode
+    # zero cannot inherit the previous scene's end-effector pose.
+    for _ in range(12):
+        env.gym.set_dof_position_target_tensor(env.sim, gymtorch.unwrap_tensor(env.cur_targets))
+        env.gym.simulate(env.sim)
+        env.gym.fetch_results(env.sim, True)
+    env.gym.refresh_dof_state_tensor(env.sim)
+    env.gym.refresh_actor_root_state_tensor(env.sim)
+    env.gym.refresh_rigid_body_state_tensor(env.sim)
     for handle_name, color in (("object", (0.85, 0.12, 0.08)), ("distractor", (0.08, 0.20, 0.85))):
         handle = env.gym.find_actor_handle(env.envs[0], handle_name)
         env.gym.set_rigid_body_color(env.envs[0], handle, 0, gymapi.MESH_VISUAL, gymapi.Vec3(*color))

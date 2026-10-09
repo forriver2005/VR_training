@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 from lerobot_policy.isaacgym_v3_closed_loop import (  # noqa: E402
-    configure, create_env, environment_action, metric, observation, scene_rows, set_scene,
+    SCENE_OFFSET, configure, create_env, environment_action, metric, observation, scene_rows, set_scene,
 )
 import tasks  # noqa: F401, E402
 from isaacgymenvs.utils.utils import set_np_formatting, set_seed  # noqa: E402
@@ -46,6 +46,10 @@ def main(cfg) -> None:
             source_plan = np.asarray(row["expert_plan"], dtype=np.float32)
             if source_plan.shape != (40, 8):
                 raise ValueError(f"episode {row['episode_index']} expert_plan has shape {source_plan.shape}")
+            if bool(cfg.get("v3_use_source_plan", False)):
+                expert_plan = source_plan.copy()
+            else:
+                expert_plan = None
             # Generate a fresh Isaac Gym expert at the actual scene positions.
             # Repeating each waypoint makes the demonstration independent of
             # the source simulator's IK interpolation and gives the fingers
@@ -54,21 +58,38 @@ def main(cfg) -> None:
             blue = np.asarray(row["cube_b_initial_xyz"], dtype=np.float32) + np.asarray([0.61, 0, 0], dtype=np.float32)
             q = source_plan[0, 3:7]
             plan = np.zeros((40, 8), dtype=np.float32)
+            # Enter a box through its open top. The source USD has one tall box
+            # and two low boxes; a fixed 10 cm approach collides with the low
+            # walls when a target cube starts inside one of them.
+            box_sizes = ((0.25, 0.30, 0.30), (0.50, 0.30, 0.10), (0.25, 0.30, 0.10))
+            def clearance(point):
+                height = 0.10
+                for box_index, size in enumerate(box_sizes):
+                    box = np.asarray(row["boxes"][f"box{box_index + 1}"]["position"], dtype=np.float32) + SCENE_OFFSET
+                    xmin, xmax = box[0], box[0] + size[0]
+                    ymin, ymax = box[1] - size[1] / 2.0, box[1] + size[1] / 2.0
+                    if xmin <= point[0] <= xmax and ymin <= point[1] <= ymax:
+                        height = max(height, size[2] + 0.08)
+                return height
+            red_clearance = clearance(red)
+            blue_clearance = clearance(blue)
+            transit_clearance = max(red_clearance, blue_clearance)
             waypoints = [
-                (0, 8, [red[0], red[1], 0.10], 0.03),
+                (0, 8, [red[0], red[1], red_clearance], 0.03),
                 (8, 13, [red[0], red[1], 0.011], 0.03),
                 (13, 20, [red[0], red[1], 0.011], 0.0),
-                (20, 24, [red[0], red[1], 0.10], 0.0),
-                (24, 31, [blue[0], blue[1], 0.10], 0.0),
+                (20, 24, [red[0], red[1], transit_clearance], 0.0),
+                (24, 31, [blue[0], blue[1], transit_clearance], 0.0),
                 (31, 35, [blue[0], blue[1], 0.045], 0.0),
                 (35, 37, [blue[0], blue[1], 0.045], 0.03),
-                (37, 40, [blue[0], blue[1], 0.12], 0.03),
+                (37, 40, [blue[0], blue[1], max(transit_clearance, 0.12)], 0.03),
             ]
             for start, end, position, finger in waypoints:
                 plan[start:end, :3] = np.asarray(position, dtype=np.float32)
                 plan[start:end, 3:7] = q
                 plan[start:end, 7] = finger
-            expert_plan = plan
+            if expert_plan is None:
+                expert_plan = plan
             for frame in range(40):
                 obs, frames = observation(env)
                 if os.environ.get("IGYM_TRACE") == "1" and frame in (0, 10, 20, 31, 39):

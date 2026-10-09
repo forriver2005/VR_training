@@ -55,7 +55,12 @@ class Inference:
         # The generic loader selects the diffusion subclass from config.json.
         config = PreTrainedConfig.from_pretrained(checkpoint)
         config.device = device
-        self.policy = DiffusionPolicy.from_pretrained(checkpoint,config=config,strict=True).to(device).eval()
+        self.modality=json.loads((checkpoint/'run_config.json').read_text()).get('modality','rgb')
+        policy_class=DiffusionPolicy
+        if self.modality=='pointcloud':
+            from pointcloud_diffusion import PointCloudPolicy
+            policy_class=PointCloudPolicy
+        self.policy = policy_class.from_pretrained(checkpoint,config=config,strict=True).to(device).eval()
         self.norm = json.loads((checkpoint/'normalization.json').read_text())
         self.device,self.seed = device,seed
         self.reset()
@@ -68,15 +73,27 @@ class Inference:
         self.inference_calls = self.clip_count = self.quaternion_fallbacks = 0
 
     @torch.inference_mode()
-    def predict(self,state,images):
-        obs = observation_tensors(state,images,self.norm,self.device)
+    def predict(self,state,images=None,point_cloud=None):
+        if self.modality=='pointcloud':
+            from rgbd_geometry import normalize_points
+            points=np.asarray(point_cloud,dtype=np.float32)
+            if points.shape!=(len(state),1024,3) or not np.isfinite(points).all():
+                raise ValueError('Expected measured, finite point cloud (B,1024,3)')
+            obs={'observation.state':vector_transform(torch.as_tensor(state,device=self.device,dtype=torch.float32),self.norm),
+                 'observation.point_cloud':torch.as_tensor(normalize_points(points),device=self.device)}
+        else:
+            obs = observation_tensors(state,images,self.norm,self.device)
         self.history.append(obs)
         if len(self.history)==1: self.history.append(obs)
         if not self.actions:
             states = torch.stack([v['observation.state'] for v in self.history],dim=1)
-            rgb = torch.stack([torch.stack([v[k] for k in CAMERAS],dim=1) for v in self.history],dim=1)
             dm = self.policy.diffusion
-            cond = dm._prepare_global_conditioning({'observation.state':states,'observation.images':rgb})
+            if self.modality=='pointcloud':
+                pc=torch.stack([v['observation.point_cloud'] for v in self.history],dim=1)
+                cond=dm._prepare_global_conditioning({'observation.state':states,'observation.point_cloud':pc})
+            else:
+                rgb = torch.stack([torch.stack([v[k] for k in CAMERAS],dim=1) for v in self.history],dim=1)
+                cond = dm._prepare_global_conditioning({'observation.state':states,'observation.images':rgb})
             # Controls both initial Gaussian noise and every DDPM variance sample.
             full = dm.conditional_sample(states.shape[0],global_cond=cond,generator=self.rng)
             chunk = vector_transform(full[:,1:9],self.norm,inverse=True).cpu().numpy()

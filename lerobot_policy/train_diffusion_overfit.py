@@ -12,6 +12,8 @@ import numpy as np
 import torch
 from diffusion_overfit_common import RAW, make_config, make_normalization, vector_transform, observation_tensors
 from lerobot.policies.diffusion.modeling_diffusion import DiffusionPolicy
+from pointcloud_diffusion import PointCloudPolicy
+from rgbd_geometry import geometry_contract, normalize_points
 
 def main():
     p = argparse.ArgumentParser()
@@ -24,6 +26,7 @@ def main():
     p.add_argument('--save-every',type=int,default=2000)
     p.add_argument('--log-every',type=int,default=100)
     p.add_argument('--resume',type=Path)
+    p.add_argument('--modality',choices=['rgb','pointcloud'],default='rgb')
     args = p.parse_args()
     torch.set_num_threads(4)
     torch.backends.cudnn.benchmark = True
@@ -34,10 +37,25 @@ def main():
     if episode['state'].shape!=(40,8) or episode['action'].shape!=(40,8):
         raise ValueError('Exactly one 40-frame episode is required')
     norm = make_normalization(episode)
-    obs = observation_tensors(episode['state'],[episode['camera_1_rgb'],episode['camera_2_rgb']],norm,args.device)
+    if args.modality=='pointcloud':
+        if not bool(episode.get('success',False)):
+            raise ValueError('Point-cloud overfit requires a physically successful replay')
+        times=episode['observation_time_s']
+        control_dt=float(episode['control_dt_s'])
+        if times.shape!=(40,) or not np.allclose(np.diff(times),control_dt,rtol=0,atol=1e-6):
+            raise ValueError('Observation timestamps do not match control period')
+        if episode['point_cloud'].shape!=(40,1024,3) or not np.isfinite(episode['point_cloud']).all():
+            raise ValueError('Expected finite point cloud (40,1024,3)')
+        obs={'observation.state':vector_transform(torch.tensor(episode['state'],device=args.device),norm),
+             'observation.point_cloud':torch.tensor(normalize_points(episode['point_cloud']),device=args.device)}
+    else:
+        obs = observation_tensors(episode['state'],[episode['camera_1_rgb'],episode['camera_2_rgb']],norm,args.device)
     actions = vector_transform(torch.tensor(episode['action'],device=args.device),norm)
     if actions.abs().max()>1.00001: raise ValueError('Expert actions exceed fixed bounds')
-    model = DiffusionPolicy(make_config(args.device)).to(args.device).train()
+    config=make_config(args.device)
+    if args.modality=='pointcloud':
+        config.input_features={'observation.state':config.input_features['observation.state']}
+    model = (PointCloudPolicy(config) if args.modality=='pointcloud' else DiffusionPolicy(config)).to(args.device).train()
     ema = copy.deepcopy(model).eval().requires_grad_(False)
     optimizer = torch.optim.AdamW(model.parameters(),lr=1e-4,betas=(.95,.999),weight_decay=1e-6)
     def lr_factor(step):
@@ -50,6 +68,8 @@ def main():
         saved = torch.load(args.resume,map_location=args.device,weights_only=False)
         if saved['source_sha256']!=source_hash or saved['normalization']!=norm:
             raise ValueError('Resume dataset/normalization mismatch')
+        if saved.get('modality','rgb')!=args.modality or saved.get('steps',args.steps)!=args.steps:
+            raise ValueError('Resume modality/training schedule mismatch')
         model.load_state_dict(saved['model']); ema.load_state_dict(saved['ema'])
         optimizer.load_state_dict(saved['optimizer']); scheduler.load_state_dict(saved['scheduler'])
         torch.set_rng_state(saved['torch_rng'].cpu())
@@ -60,7 +80,18 @@ def main():
         observation_indices=[-1,0],action_indices=list(range(-1,15)),padding='repeat boundary frames',
         augmentation=False,crop=False,network='shared ResNet18 GroupNorm + UNet [64,128,256]',
         ema_power=.75,ddpm_steps=100,optimizer='AdamW lr=1e-4 betas=(.95,.999) wd=1e-6',
-        normalization=norm,device=args.device)
+        normalization=norm,device=args.device,modality=args.modality,
+        pointcloud_contract='XYZ FR3 base; fixed crop [.15,-.45,0] to [.95,.25,.95]; deterministic FPS 1024')
+    if args.modality=='pointcloud':
+        contract['network']='PointNet [64,128,256] LN ->64; state MLP 8->64->64; UNet [64,128,256]'
+        contract['pointcloud_contract']=geometry_contract()
+        contract['control_dt_s']=control_dt
+        source_manifest=args.source.parent/'replay_manifest.json'
+        contract['replay_manifest']=str(source_manifest.resolve())
+        contract['replay_manifest_sha256']=hashlib.sha256(source_manifest.read_bytes()).hexdigest()
+        replay=json.loads(source_manifest.read_text())
+        contract['reset_settle_steps']=replay['reset_settle_steps']
+        contract['scene_sha256']=replay['source_sha256']
     (args.output/'run_config.json').write_text(json.dumps(contract,indent=2)+'\n')
     wall=time.monotonic(); losses=[]
     print(json.dumps(dict(parameters=sum(v.numel() for v in model.parameters()),
@@ -99,7 +130,8 @@ def main():
             (checkpoint/'ema'/'run_config.json').write_text(json.dumps(contract,indent=2)+'\n')
             torch.save(dict(step=step,model=model.state_dict(),ema=ema.state_dict(),optimizer=optimizer.state_dict(),
                 scheduler=scheduler.state_dict(),torch_rng=torch.get_rng_state(),cuda_rng=torch.cuda.get_rng_state_all(),
-                python_rng=random.getstate(),numpy_rng=np.random.get_state(),normalization=norm,source_sha256=source_hash),
+                python_rng=random.getstate(),numpy_rng=np.random.get_state(),normalization=norm,source_sha256=source_hash,
+                modality=args.modality,steps=args.steps),
                 checkpoint/'training_state.pt')
             (args.output/'latest_checkpoint.txt').write_text(str(checkpoint.resolve())+'\n')
             print(f'Saved EMA and resumable checkpoint at step {step}',flush=True)

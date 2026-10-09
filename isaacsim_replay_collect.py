@@ -165,7 +165,10 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--resume", action="store_true", help="retain completed attempts and collect missing scene quotas")
     p.add_argument("--num-gpus", type=int, default=1, choices=range(1, 7))
     p.add_argument("--dry-run", action="store_true", help="validate every source JSON without starting Isaac Sim")
-    p.add_argument("--physics-steps-per-frame", type=int, default=12)
+    p.add_argument("--physics-steps-per-frame", type=int, default=15,
+                   help="15 preserves the measured legacy 8 Hz control period; 12 is strict 10 Hz")
+    p.add_argument("--reset-settle-steps", type=int, default=123,
+                   help="explicit physics steps matching the successful legacy reset")
     p.add_argument("--static-friction", type=float, default=CONTACT_STATIC_FRICTION)
     p.add_argument("--dynamic-friction", type=float, default=CONTACT_DYNAMIC_FRICTION)
     p.add_argument("--restitution", type=float, default=CONTACT_RESTITUTION)
@@ -177,6 +180,13 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--policy-rgb-codec", choices=("h264", "raw"), default="h264")
     p.add_argument("--eval-episode-npz", type=Path,
                    help="frozen actions and initial joint/state telemetry for exact-episode evaluation")
+    p.add_argument("--expert-replay", action="store_true",
+                   help="replay the frozen expert action without connecting to a policy server")
+    p.add_argument("--save-rgbd-pcd", action="store_true",
+                   help="save depth, camera calibration, and fixed-size FR3-base point clouds")
+    p.add_argument("--pcd-points", type=int, default=1024)
+    p.add_argument("--replay-joint-targets", action="store_true",
+                   help="diagnostic expert replay using recorded joint targets instead of IK outputs")
     return p
 
 
@@ -486,6 +496,9 @@ def _replay_with_simulation(args: argparse.Namespace, episodes: list[dict]) -> N
         stage.Export(str(configured_scene_path))
     world.reset()
     [camera.initialize() for camera in cameras]
+    if args.save_rgbd_pcd:
+        for camera in cameras:
+            camera.add_distance_to_image_plane_to_frame()
     # Camera.initialize() restores its default 1-inch-style aperture and may
     # also adjust it to the render target aspect ratio.  Reapply the authored
     # training-camera intrinsics after initialization so runtime rendering
@@ -495,6 +508,26 @@ def _replay_with_simulation(args: argparse.Namespace, episodes: list[dict]) -> N
         camera.prim.GetAttribute("verticalAperture").Set(20.955)
         camera.prim.GetAttribute("horizontalAperture").Set(20.955)
         camera.set_clipping_range(0.01, 100.0)
+    camera_intrinsics = np.stack([np.asarray(camera.get_intrinsics_matrix(), dtype=np.float32) for camera in cameras])
+    camera_extrinsics = np.stack([
+        np.r_[np.asarray(camera.get_world_pose(camera_axes="usd")[0], dtype=np.float32),
+              np.asarray(camera.get_world_pose(camera_axes="usd")[1], dtype=np.float32)]
+        for camera in cameras
+    ])
+    camera_to_world = np.stack([np.linalg.inv(np.asarray(camera.get_view_matrix_ros(device='cpu')))
+                                for camera in cameras]).astype(np.float32)
+    from lerobot_policy.rgbd_geometry import geometry_contract, point_cloud_from_depth
+
+    def synchronize_render():
+        before_time = world.current_time
+        before_q = np.asarray(robot.get_joint_positions()).copy()
+        # CPU PhysX also needs explicit kinematic refresh after a teleport.
+        world.physics_sim_view.update_articulations_kinematic()
+        for _ in range(4):
+            world.render()
+        if world.current_time != before_time or not np.array_equal(before_q,robot.get_joint_positions()):
+            raise RuntimeError('Observation rendering advanced physics or changed joints')
+        return float(world.current_time)
     if review_camera is not None:
         review_camera.initialize()
         review_camera.set_focal_length(1.8)
@@ -503,8 +536,9 @@ def _replay_with_simulation(args: argparse.Namespace, episodes: list[dict]) -> N
         review_camera.set_clipping_range(0.01, 100.0)
     robot.set_joint_positions(np.array([0, -0.6, 0, -2.2, 0, 1.6, 0.8, 0.03, 0.03], dtype=np.float32))
     robot.apply_action(ArticulationAction(joint_positions=robot.get_joint_positions()))
-    for _ in range(12):
-        world.step(render=True)
+    for _ in range(48):
+        world.step(render=False)
+    world.render()
     controller = robot.get_articulation_controller()
     dof_names = ["fr3_joint1", "fr3_joint2", "fr3_joint3", "fr3_joint4", "fr3_joint5", "fr3_joint6", "fr3_joint7", "panda_finger_joint1"]
     indices = [robot.get_dof_index(name) for name in dof_names]
@@ -527,6 +561,9 @@ def _replay_with_simulation(args: argparse.Namespace, episodes: list[dict]) -> N
                 "retargeting": "source XY preserved; Z adapted to resized cubes, carry clearance, held descent, open and retreat",
                 "official_fr3v2_commit": "7aeeddc449edf8d62b594f9e36a81da53e7796f9"}
     manifest["raw_root"] = str(args.raw_root.resolve())
+    if args.save_rgbd_pcd:
+        manifest["point_cloud_contract"] = geometry_contract()
+        manifest["point_cloud_contract"]["points"] = args.pcd_points
     manifest["source_sha256"] = {}
     for path in [args.usd, args.urdf, replay_urdf] + [args.raw_root / name for name in scene_files]:
         # v3 closed-loop evaluation may intentionally use the frozen scene
@@ -536,6 +573,10 @@ def _replay_with_simulation(args: argparse.Namespace, episodes: list[dict]) -> N
     manifest["configured_scene_sha256"] = hashlib.sha256(configured_scene_path.read_bytes()).hexdigest()
     manifest.update(cube_a_size_m=0.02, cube_b_size_m=0.025, cube_a_mass_kg=0.05, cube_b_mass_kg=0.08,
                     physics_dt_s=1 / 120, physics_steps_per_frame=args.physics_steps_per_frame,
+                    control_dt_s=args.physics_steps_per_frame / 120,
+                    reset_contract="initial expert-pose IK; zero joint velocities; explicit physics-only settling",
+                    reset_settle_steps=args.reset_settle_steps,
+                    render_contract="physics-only steps; four observation renders without advancing simulation",
                     camera_resolution=[256, 256], camera_clipping_m=[0.01, 100.0],
                     success_criteria={"max_xy_error_m": 0.009, "stack_center_z_difference_m": 0.0225,
                                       "max_stack_z_error_m": 0.004, "max_settled_drift_m": 0.001,
@@ -549,7 +590,7 @@ def _replay_with_simulation(args: argparse.Namespace, episodes: list[dict]) -> N
     }
     policy_socket = None
     policy_roundtrips = None
-    if args.eval_index is not None:
+    if args.eval_index is not None and not args.expert_replay:
         policy_socket = socket.create_connection((args.policy_host, args.policy_port), timeout=120)
         policy_socket.settimeout(120)
         send_arrays(policy_socket, command_message("ping"))
@@ -574,13 +615,15 @@ def _replay_with_simulation(args: argparse.Namespace, episodes: list[dict]) -> N
             usd_box_names = {1: "box", 2: "box1", 3: "box2"}
             path = f"/World/{usd_box_names[i]}"
             set_pose(path, box["position"], box["rotation"])
-        world.step(render=True)
+        for _ in range(4):
+            world.step(render=False)
         # The first observation must be rendered after the initial pose has
         # settled.  Without a rendered step here, Isaac returns the previous
         # camera buffer for frame 0 while the telemetry already reports the
         # new joint state, creating a state/image mismatch at episode start.
-        for step in range(120):
-            world.step(render=(step == 119))
+        for step in range(args.reset_settle_steps):
+            world.step(render=False)
+        world.render()
         resting_a = cubes[0].get_world_pose()[0]
         resting_b = cubes[1].get_world_pose()[0]
         states, actions = [], []
@@ -588,6 +631,13 @@ def _replay_with_simulation(args: argparse.Namespace, episodes: list[dict]) -> N
         # inputs; DemoGrasp trains on eefpose+handdof for this robot variant.
         joint_positions, joint_targets = [], []
         frames = {"observation.camera_1.rgb": [], "observation.camera_2.rgb": []}
+        frozen_joint_targets = None
+        if args.replay_joint_targets:
+            if args.eval_episode_npz is None or not args.expert_replay:
+                raise ValueError('--replay-joint-targets requires frozen expert replay')
+            with np.load(args.eval_episode_npz) as frozen:
+                frozen_joint_targets = frozen['joint_target'].copy()
+        depths, point_clouds, point_diagnostics, observation_times, raw_actions = [], [], [], [], []
         review_frames = []
         retargeted = item["action"].copy()
         # Preserve recorded offsets while retargeting the source cube heights
@@ -613,8 +663,9 @@ def _replay_with_simulation(args: argparse.Namespace, episodes: list[dict]) -> N
         robot.apply_action(ArticulationAction(joint_positions=np.r_[start_q, first[7], first[7]]))
         # Synchronize the camera buffer with the initial robot pose before
         # recording observation frame 0.
-        for step in range(120):
-            world.step(render=(step == 119))
+        for step in range(args.reset_settle_steps):
+            world.step(render=False)
+        world.render()
         if args.eval_episode_npz is not None:
             with np.load(args.eval_episode_npz) as frozen:
                 initial_q = np.r_[frozen["joint_position"][0],
@@ -622,8 +673,10 @@ def _replay_with_simulation(args: argparse.Namespace, episodes: list[dict]) -> N
             robot.set_joint_positions(initial_q)
             robot.set_joint_velocities(np.zeros(9))
             robot.apply_action(ArticulationAction(joint_positions=initial_q))
-            for step in range(12):
-                world.step(render=(step == 11))
+            # Setting the frozen telemetry pose must be the final operation
+            # before frame 0. Advancing physics here lets drive damping move
+            # the arm before the first observation and breaks episode alignment.
+            synchronize_render()
         cube_history = []
         ik_failures = 0
         policy_action_clipped = 0
@@ -631,7 +684,7 @@ def _replay_with_simulation(args: argparse.Namespace, episodes: list[dict]) -> N
         policy_inference_calls = 0
         grasp_xy_errors = []
         if policy_socket is not None:
-            send_arrays(policy_socket, command_message("reset"))
+            send_arrays(policy_socket, {**command_message("reset"), "episode_id": np.asarray(episode_index)})
             if read_command(receive_arrays(policy_socket)) != "ok":
                 raise RuntimeError("Policy server did not reset")
         for frame_index, expert_target in enumerate(retargeted):
@@ -640,7 +693,7 @@ def _replay_with_simulation(args: argparse.Namespace, episodes: list[dict]) -> N
             arm_current = current[:7]
             # Isaac's camera annotator is asynchronous with the physics step;
             # flush the render queue before reading the observation buffer.
-            world.render()
+            observation_times.append(synchronize_render())
             rgb = []
             for camera in cameras:
                 image = camera.get_rgb()
@@ -655,6 +708,13 @@ def _replay_with_simulation(args: argparse.Namespace, episodes: list[dict]) -> N
                 if image.ndim != 3 or image.shape[0] != 256 or image.shape[1] != 256:
                     raise RuntimeError(f"camera {camera.name} returned invalid RGB shape {image.shape}")
                 rgb.append(image[:, :, :3].copy())
+            cloud = None
+            if args.save_rgbd_pcd:
+                depth = np.stack([np.asarray(camera.get_depth(),dtype=np.float32).copy() for camera in cameras])
+                if depth.shape != (2,256,256):
+                    raise RuntimeError(f'Invalid synchronized depth shape: {depth.shape}')
+                cloud, diag = point_cloud_from_depth(depth,camera_intrinsics,camera_to_world,args.pcd_points)
+                depths.append(depth); point_clouds.append(cloud); point_diagnostics.append(diag)
             policy_rgb = rgb
             if policy_roundtrips is not None:
                 policy_rgb = [roundtrip(image) for roundtrip, image in zip(policy_roundtrips, rgb)]
@@ -666,13 +726,19 @@ def _replay_with_simulation(args: argparse.Namespace, episodes: list[dict]) -> N
             else:
                 send_arrays(policy_socket, {
                     "command": np.asarray("predict"),
+                    "episode_id": np.asarray(episode_index),
+                    "request_id": np.asarray(frame_index),
                     "observation.state": state_now[None],
                     "observation.camera_1.rgb": policy_rgb[0][None],
                     "observation.camera_2.rgb": policy_rgb[1][None],
+                    **({"observation.point_cloud": cloud[None]} if cloud is not None else {}),
                 })
                 prediction = receive_arrays(policy_socket)
                 if read_command(prediction) != "action" or prediction["action"].shape != (1, 8):
                     raise RuntimeError(f"Invalid policy action at frame {frame_index}")
+                if int(prediction['episode_id'])!=episode_index or int(prediction['request_id'])!=frame_index:
+                    raise RuntimeError('Policy response belongs to another episode or observation')
+                raw_actions.append(prediction['raw_action'][0].copy())
                 policy_action_clipped += int(bool(prediction.get("action_clipped", np.asarray(False)).item()))
                 policy_quaternion_fallbacks += int(bool(prediction.get("quaternion_fallback", np.asarray(False)).item()))
                 policy_inference_calls = max(policy_inference_calls,
@@ -693,6 +759,8 @@ def _replay_with_simulation(args: argparse.Namespace, episodes: list[dict]) -> N
             ik_failures += int(not ik_ok)
             q = np.zeros(len(indices), dtype=np.float32)
             q[:7] = np.asarray(ik_q if ik_ok else arm_current, dtype=np.float32)
+            if frozen_joint_targets is not None:
+                q[:7] = frozen_joint_targets[frame_index]
             q[7] = float(target[7])
             if not np.isfinite(q).all():
                 raise RuntimeError(f"Nonfinite robot state in episode {episode_index}, frame {frame_index}")
@@ -724,10 +792,15 @@ def _replay_with_simulation(args: argparse.Namespace, episodes: list[dict]) -> N
             joint_targets.append(q[:7].copy())
             controller.apply_action(ArticulationAction(joint_positions=np.r_[q, q[7]], joint_indices=np.r_[indices, robot.get_dof_index("panda_finger_joint2")]))
             for physics_step in range(args.physics_steps_per_frame):
-                world.step(render=(physics_step == args.physics_steps_per_frame - 1))
+                world.step(render=False)
+            world.render()
             cube_history.append([cubes[0].get_world_pose()[0].tolist(), cubes[1].get_world_pose()[0].tolist()])
         state = np.asarray(states, dtype=np.float32)
         action = np.asarray(actions, dtype=np.float32)
+        observed_dt = np.diff(observation_times)
+        expected_dt = args.physics_steps_per_frame / 120
+        if not np.allclose(observed_dt, expected_dt, rtol=0, atol=1e-6):
+            raise RuntimeError(f"Observation timing mismatch: expected {expected_dt}, got {observed_dt.tolist()}")
         if args.diagnostics:
             np.savez_compressed(out / f"diagnostic_{episode_index:06d}.npz", state=state, action=action,
                             camera_1_rgb=np.asarray(frames["observation.camera_1.rgb"]),
@@ -736,8 +809,9 @@ def _replay_with_simulation(args: argparse.Namespace, episodes: list[dict]) -> N
         stable = []
         settle_positions = []
         for step in range(120):
-            world.step(render=review_camera is not None and step % 12 == 11)
-            if review_camera is not None and step % 12 == 11:
+            world.step(render=False)
+            if review_camera is not None and step % args.physics_steps_per_frame == args.physics_steps_per_frame-1:
+                world.render()
                 image = review_camera.get_rgb()
                 if image is None:
                     raise RuntimeError("review camera did not produce RGB during settling")
@@ -759,11 +833,11 @@ def _replay_with_simulation(args: argparse.Namespace, episodes: list[dict]) -> N
             scene_id = int(item["source_file"].split("_")[1])
             status = "SUCCESS" if success else "REJECTED"
             video_path = args.review_video_dir / f"scene_{scene_id:02d}_trajectory_{item['trajectory_id']:03d}_{status}.mp4"
-            write_review_video(review_frames, video_path, 10)
+            write_review_video(review_frames, video_path, manifest['fps'])
             video_path.with_suffix(".json").write_text(json.dumps({
                 "source_file": item["source_file"], "trajectory_id": item["trajectory_id"],
                 "replay_episode_index": episode_index, "success": bool(success), "frames": len(review_frames),
-                "fps": 10, "resolution": [960, 540], "camera": "Isaac Sim full-scene overview",
+                "fps": manifest['fps'], "resolution": [960, 540], "camera": "Isaac Sim full-scene overview",
                 "xy_error_m": xy, "z_delta_m": zd, "settled_position_drift_m": position_drift.tolist(),
                 "grasp_xy_error_m": grasp_xy_error,
                 "ik_failures": ik_failures,
@@ -771,12 +845,24 @@ def _replay_with_simulation(args: argparse.Namespace, episodes: list[dict]) -> N
                 "policy_quaternion_fallback_count": policy_quaternion_fallbacks,
                 "policy_inference_calls": policy_inference_calls,
             }, indent=2) + "\n", encoding="utf-8")
-        if success or policy_socket is not None:
+        if success or policy_socket is not None or args.save_rgbd_pcd or args.expert_replay:
+            extra = {"observation_time_s": np.asarray(observation_times,dtype=np.float64),
+                     "frame_index": np.arange(40,dtype=np.int64),
+                     "success": np.asarray(bool(success)),
+                     "control_dt_s": np.asarray(expected_dt)}
+            if args.save_rgbd_pcd:
+                extra.update(depth=np.asarray(depths,dtype=np.float32),
+                             point_cloud=np.asarray(point_clouds,dtype=np.float32),
+                             camera_intrinsics=camera_intrinsics,
+                             camera_to_world=camera_to_world,
+                             camera_pose_usd_xyz_wxyz=camera_extrinsics)
+            if policy_socket is not None:
+                extra['policy_raw_action']=np.asarray(raw_actions,dtype=np.float32)
             np.savez_compressed(out / f"episode_{episode_index:06d}.npz", state=state, action=action,
                                 joint_position=np.asarray(joint_positions, dtype=np.float32),
                                 joint_target=np.asarray(joint_targets, dtype=np.float32),
                                 camera_1_rgb=np.asarray(frames["observation.camera_1.rgb"]),
-                                camera_2_rgb=np.asarray(frames["observation.camera_2.rgb"]))
+                                camera_2_rgb=np.asarray(frames["observation.camera_2.rgb"]), **extra)
             if success:
                 counts[item["source_file"]] += 1
         records.append({"episode_index": episode_index, "success": bool(success), "source_file": item["source_file"],
@@ -793,6 +879,8 @@ def _replay_with_simulation(args: argparse.Namespace, episodes: list[dict]) -> N
                         "policy_action_clipping_count": policy_action_clipped,
                         "policy_quaternion_fallback_count": policy_quaternion_fallbacks,
                         "policy_inference_calls": policy_inference_calls,
+                        "point_cloud_diagnostics": point_diagnostics,
+                        "observation_time_s": observation_times,
                         "cube_history": cube_history,
                         "demo_grasp_modality": "eefpose+handdof; state/action shape (8,), two RGB cameras",
                         "joint_audit": {"names": dof_names[:7], "state_saved": True, "target_saved": True},
@@ -817,6 +905,8 @@ def main() -> None:
         raise FileNotFoundError(f"missing USD/URDF: {args.usd}, {args.urdf}")
     if args.physics_steps_per_frame <= 0 or 120 % args.physics_steps_per_frame:
         raise ValueError("Physics steps per frame must be a positive divisor of 120")
+    if args.reset_settle_steps<=0 or args.pcd_points<=0:
+        raise ValueError('Reset settling steps and point count must be positive')
     if args.static_friction < 0 or args.dynamic_friction < 0 or args.restitution < 0:
         raise ValueError("Contact material parameters must be non-negative")
     if args.static_friction < args.dynamic_friction:

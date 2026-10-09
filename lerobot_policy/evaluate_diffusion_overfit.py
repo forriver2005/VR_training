@@ -25,7 +25,8 @@ def main():
         inference.reset(seed); predicted=[]; raw=[]; wall=time.monotonic()
         for t in range(40):
             action,diag=inference.predict(ep['state'][t:t+1],
-                [ep['camera_1_rgb'][t:t+1],ep['camera_2_rgb'][t:t+1]])
+                [ep['camera_1_rgb'][t:t+1],ep['camera_2_rgb'][t:t+1]],
+                ep['point_cloud'][t:t+1] if inference.modality=='pointcloud' else None)
             predicted.append(action[0]); raw.append(diag['raw_action'][0])
         pred=np.asarray(predicted); target=ep['action']
         pos=np.linalg.norm(pred[:,:3]-target[:,:3],axis=-1)

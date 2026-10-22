@@ -1,4 +1,11 @@
-# DemoGrasp LeRobot ACT baseline
+# DemoGrasp policy implementations
+
+当前 FR3V2 方块堆叠使用 Isaac Sim 与 Diffusion Policy。入口见
+[跨设备复现入口](../repro/README.md)，质量和推荐权重见
+[实验报告](../reports/existing398_quality_20261021/report.md)。
+下方保留的是早期 ACT / Isaac Gym 分支说明。
+
+## Legacy LeRobot ACT baseline
 
 These scripts use LeRobot 0.4.4 without importing the DemoGrasp runtime. Activate
 the `lerobot` environment before running `train_act.sh`; the training script invokes

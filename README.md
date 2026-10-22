@@ -1,4 +1,7 @@
 # DemoGrasp: Universal Dexterous Grasping from a Single Demonstration
+
+> **当前 FR3V2 / Isaac Sim / Diffusion Policy 复现入口：** [安装、资源下载、训练与完整评测](repro/README.md)。推荐权重和全部方法源码随本分支交付，较大数据通过带SHA256的Release资源下载。原138/138为回归成绩，不是公开SOTA或独立泛化证明。
+
 Official code for **DemoGrasp: Universal Dexterous Grasping from a Single Demonstration** *(ICLR 2026)*.
 
 <div align="center">

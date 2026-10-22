@@ -1,0 +1,15 @@
+{
+  "kind": "action_steps",
+  "previous": 8,
+  "value": 8,
+  "parent": "/home/houshengyuan/DexResearch/DemoGrasp/lerobot_policy/outputs/existing398_20261021/height_aware_policy",
+  "parent_contract_sha256": "fb3ad07cb9c416b290f89bf67d401fb90708158b72a384f4f22f43a69d12900b",
+  "weights_retrained": false,
+  "action_samples": 4,
+  "binary_gripper": true,
+  "fixed_down_quaternion": true,
+  "anchor_snap_epsilon": 0.05,
+  "goal_terminal_constraints": true,
+  "ensemble": "mean of normalized latent trajectories before geometric decoding",
+  "constraints_source": "verified constant/binary action labels of every training episode"
+}

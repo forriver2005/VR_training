@@ -1,0 +1,26 @@
+{
+  "low": [
+    -0.7999999999999999,
+    -1.1,
+    -0.95,
+    -1.0,
+    -1.0,
+    -1.0,
+    -1.0,
+    0.0,
+    0.0
+  ],
+  "high": [
+    0.7999999999999999,
+    1.1,
+    0.95,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    0.04,
+    1.0
+  ],
+  "quaternion": "xyzw absolute FR3 base",
+  "source": "fixed initial measured TCP / measured goal anchors; XY alpha, Z beta=clip((7alpha-4)/3); ninth learned alpha"
+}

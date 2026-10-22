@@ -11,3 +11,10 @@ runs_ppo/
 thirdparty/
 assets/
 data/
+
+# Portable reproduction resources and local environments
+.venvs/
+.repro_cache/
+repro-runs/
+trajectory_replays/
+*.repro-part

@@ -1,0 +1,114 @@
+{
+  "frozen": {
+    "frozen_at_utc": "2026-10-21T16:22:34.700528+00:00",
+    "checkpoint": "/home/houshengyuan/DexResearch/DemoGrasp/lerobot_policy/outputs/existing398_20261021/height_aware_policy",
+    "checkpoint_sha256": {
+      "transport_height_contract_audit.json": "3e20fbe22550751b5057ffb7b7cef72fdae2daf5d1b21ef1e4b40339d8c09db5",
+      "config.json": "970ace7b433ba8bee039cf1c9f34ac7b7cf14ea17b00a0bb2dcc8dc630862777",
+      "goal_estimator_source.py": "e90f78278862dff4876aead8dd79c2abf90cc56fd86b19b34c27a1bf69ab768a",
+      "run_config.json": "fb3ad07cb9c416b290f89bf67d401fb90708158b72a384f4f22f43a69d12900b",
+      "normalization.json": "1a7f15635926d7631c8fb049aaecffcf3ed6c1989fedc7aae239e02b1db7f48d",
+      "model.safetensors": "4b740b64c0e9095d5fe12dcfa158f5a18b14aa4ea3155d7ed8e7fbabc8e823df",
+      "release_action_contract_audit.json": "abbae8215eb8100f8a632fc37ebd02aef952c7961bd0c86c6787c42fac427eb1",
+      "inference_ablation.json": "47a884ba0597c9deb01b16439a6550c709a9d0ae7576d45f5fedadf82d18bb54",
+      "terminal_action_contract_audit.json": "2de1ba3e065747548060b1db164921710de29d337000a7331d9e269f397c0cda"
+    },
+    "source_sha256": {
+      "evaluate_delivery_diffusion.py": "2c134b9053cd9a1fa8652bf95d8b6ef156a1cc563daf413965f2f98cc8832f6b",
+      "delivery_policy_contract.py": "5d6c64192f896309022913a31b45b3b4f2ca2bd57369f5f29351a352aacbac8b",
+      "relative_action.py": "baab2bb0ecc792096824bf6b6a0d0de6ba0e252b06f3b4213ba31c9b4c14a736",
+      "train_delivery_diffusion.py": "519691e6c2845f29592fa40370fa79b121f83d068cea99766a95d1e70cd95e81",
+      "diffusion_policy_server.py": "dd8ea9dd5648b279cbcdca75a895c65f7a0019bc9ceb318e313516ca69f1b282",
+      "spatial_pointcloud.py": "8e5bd64811d4a4530af59b2d256761276d3376f856899e8aa123607944b348f2",
+      "run_delivery_sweep.py": "45827685b9dfdbb2409ceb127a2503b47a5b2c1f05f979d61aa89d26ce4149ba",
+      "derive_transport_guard_checkpoint.py": "73cd397fdad8915d8af5c33c0ba413b9e7c8cc2cf6507c00201c0568044b2905",
+      "smooth_joint_targets.py": "46c674a6b6cd8d0724070bbe0dd5a026849a9505486392e126effeba0cf1b993",
+      "derive_action_steps_checkpoint.py": "028c8af4a7ccb367ea91eae4448563930479b7d12f4feaa899caa9c59d9b6767",
+      "derive_smooth_controller_checkpoint.py": "a5e56e9f86a5e6174303382b0edbe3ee95c74cd2b70f601fc92fe9cec0153f4c",
+      "derive_release_guard_checkpoint.py": "e5c75ad2d5c68938a941843db7a0d344f46959cc44d9dc8e07f4bfd9aef50e14",
+      "run_delivery_episode.py": "65b024813f283926bf82e3000bea2bc74be7fbdb247b8869fe5913f9554a9982",
+      "monitor_delivery_validation.py": "f82761a2ddbd7d59769a5e7222c6eb1aa5cdc0ccad32559af84abe21ea613142",
+      "derive_monotonic_gate_checkpoint.py": "1ba8d293e86b7c4d6034dc99a3230e056da4a6e13905159e8fd26119da537c1b",
+      "rgbd_goal_geometry_v2.py": "e90f78278862dff4876aead8dd79c2abf90cc56fd86b19b34c27a1bf69ab768a",
+      "goal_observation_registry.py": "9cc7be87b794e2715b54ca1e978dbec33181ce13c77b657f260b37ba90ae4d77",
+      "derive_goal_recipe_checkpoint.py": "7ea413b363bd35b367b594df5138ba4b45ea05be963994324097b842649bd3fe",
+      "transport_clearance_guard.py": "3fdeb8a28f1befca4aff017ba10c7d6564c32e106972629cb3a5add13a63d965",
+      "episode_goal_3d.py": "32a7f7277496c6786dc174fe44e7250c4dfedcab2211782fb690357029e6c764",
+      "socket_protocol.py": "2d2639670008695170f694837a0b79bc9a145aa58f6ea4b8d054c8b1812caf59",
+      "pointcloud_diffusion.py": "121561cae70d100252218c576f2ed4cc9fda51ff4554a2cd344285881abd1fff",
+      "rgbd_object_features.py": "9ad764c72215a295af02e2bf381946f717ef3f1bfc12559e5338598c9c8f5cb0",
+      "run_delivery_trials.py": "161909fbb42bf6495cef464c4ce611e564d505e92e081fc6948721931a1cc12f",
+      "release_guard.py": "1e98ec684fff95ee2c5b1842289f6e743c174851799ca0948281b7c5c4040b59",
+      "diffusion_overfit_common.py": "b354ed6d960efe8e37e22e73a2c11b797e21e3fc73220ca0a46796866eeddab1"
+    },
+    "known_regression": {
+      "successes": 90,
+      "count": 90,
+      "groups": {
+        "0": {
+          "count": 5,
+          "successes": 5
+        },
+        "1": {
+          "count": 5,
+          "successes": 5
+        },
+        "2": {
+          "count": 5,
+          "successes": 5
+        },
+        "3": {
+          "count": 5,
+          "successes": 5
+        },
+        "4": {
+          "count": 10,
+          "successes": 10
+        },
+        "5": {
+          "count": 20,
+          "successes": 20
+        },
+        "6": {
+          "count": 20,
+          "successes": 20
+        },
+        "7": {
+          "count": 20,
+          "successes": 20
+        }
+      }
+    },
+    "composition_evaluation": {
+      "manifest": "/home/houshengyuan/DexResearch/DemoGrasp/data/evaluation_manifests/fr3v2_existing_holdouts_20261021/local_combinations.jsonl",
+      "manifest_sha256": "c3f8bd3447895c41951bfa68fb74a262eb5067e21b25f3e4c8b3942f8cbf87c8",
+      "tasks_sha256": "2ef62206eaaa196f1ae2a8a7362b8fa97803d2dfbe53b3cae4285b60abf6593d",
+      "layouts": 16,
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "training_use": false,
+      "prior_policy_performance_selection_use": false,
+      "limits": "same four backgrounds; input/action observability was audited earlier; not a fully untouched new-background benchmark"
+    },
+    "raw_training_episodes": 398,
+    "new_training_demonstrations_added": 0
+  },
+  "evidence_sha256": {
+    "lerobot_policy/outputs/existing398_20261021/height_aware_regression/summary.json": "a3a8c83d171ae62704847b461c54d936d0a77abbde289da0fcaf4eac87517f0d",
+    "lerobot_policy/outputs/existing398_20261021/local_combination_policy/summary.json": "750dd8c2f3a5195f5d799c09c777fc851a3f535e059c1f33d424230a5d4bc555",
+    "lerobot_policy/outputs/existing398_20261021/final_test/summary.json": "6614eab8e585393eb8315c6fd62234af80bf371e5f243368bada980a6a591ed3",
+    "lerobot_policy/outputs/existing398_20261021/fresh_holdout_policy/summary.json": "3b163b99774c7c45df73e03362435e41dd07026bdd6867cb2b272ef3da0b1c86",
+    "lerobot_policy/outputs/existing398_20261021/height_policy_unit_tests.log": "264a0c048f07fd64c7a61b929631e44082fecfa00dca5994d3d3c97cdfc0132a",
+    "data/evaluation_manifests/fr3v2_existing_holdouts_20261021/all_known_scenes.jsonl": "a6e63f71367ccfd31e86d875bb3a5bf8c2177530dbe886901174bb8cc9ffdaca",
+    "data/evaluation_manifests/fr3v2_existing_holdouts_20261021/local_combinations.jsonl": "c3f8bd3447895c41951bfa68fb74a262eb5067e21b25f3e4c8b3942f8cbf87c8"
+  },
+  "GPUs_used": [
+    0,
+    1,
+    2
+  ],
+  "source_assets_modified": false
+}

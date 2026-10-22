@@ -1,0 +1,62 @@
+[
+  {
+    "index": 0,
+    "first_valid_frame": 0,
+    "measured": [
+      0.6089780926704407,
+      -0.10260814428329468,
+      0.045256733894348145
+    ],
+    "error_mm": 0.0007233201945685285,
+    "methods": [
+      "surface_normal",
+      "surface_normal",
+      "surface_normal"
+    ]
+  },
+  {
+    "index": 1,
+    "first_valid_frame": 0,
+    "measured": [
+      0.5825286507606506,
+      0.35073983669281006,
+      0.04525717347860336
+    ],
+    "error_mm": 0.0015274562171117632,
+    "methods": [
+      "surface_normal",
+      "surface_normal",
+      "surface_normal"
+    ]
+  },
+  {
+    "index": 2,
+    "first_valid_frame": 0,
+    "measured": [
+      0.40979117155075073,
+      0.33999955654144287,
+      0.045256104320287704
+    ],
+    "error_mm": 0.0006856756167692521,
+    "methods": [
+      "surface_normal",
+      "surface_normal",
+      "surface_normal"
+    ]
+  },
+  {
+    "index": 3,
+    "first_valid_frame": 0,
+    "measured": [
+      0.38700053095817566,
+      -0.060900554060935974,
+      0.045256126672029495
+    ],
+    "error_mm": 0.000642190277035158,
+    "methods": [
+      "surface_normal",
+      "surface_normal",
+      "surface_normal"
+    ]
+  }
+]

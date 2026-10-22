@@ -1,0 +1,219 @@
+{
+  "checkpoint": "/home/houshengyuan/DexResearch/DemoGrasp/lerobot_policy/outputs/existing398_20261021/height_aware_policy",
+  "training_episodes": 398,
+  "training_layouts": 4,
+  "new_training_demonstrations": 0,
+  "known_layout_regression": {
+    "count": 90,
+    "successes": 90,
+    "mean_final_xy_mm": 1.2329717262926148,
+    "max_final_xy_mm": 4.595916718244553,
+    "max_stable_xy_mm": 4.595928359776735,
+    "max_height_error_mm": 0.004019588232040405,
+    "max_drift_mm": 0.009305393177783117,
+    "max_speed_mm_s": 3.9691405762214824,
+    "ik_failures": 0,
+    "workspace_clips": 0,
+    "forbidden_contact_trials": 0,
+    "release_guard_overrides": 271,
+    "terminal_goal_projections": 1316,
+    "minimum_final_tcp_height_above_measured_goal_m": 0.1237243004143238
+  },
+  "known_layout_groups": {
+    "0": {
+      "count": 5,
+      "successes": 5
+    },
+    "1": {
+      "count": 5,
+      "successes": 5
+    },
+    "2": {
+      "count": 5,
+      "successes": 5
+    },
+    "3": {
+      "count": 5,
+      "successes": 5
+    },
+    "4": {
+      "count": 10,
+      "successes": 10
+    },
+    "5": {
+      "count": 20,
+      "successes": 20
+    },
+    "6": {
+      "count": 20,
+      "successes": 20
+    },
+    "7": {
+      "count": 20,
+      "successes": 20
+    }
+  },
+  "local_combinations": {
+    "count": 48,
+    "successes": 46,
+    "mean_final_xy_mm": 1.0714192973561392,
+    "max_final_xy_mm": 5.3284731693565845,
+    "max_stable_xy_mm": 5.329904146492481,
+    "max_height_error_mm": 0.00398978590965271,
+    "max_drift_mm": 0.023550319383502938,
+    "max_speed_mm_s": 4.136457484153311,
+    "ik_failures": 0,
+    "workspace_clips": 0,
+    "forbidden_contact_trials": 0,
+    "release_guard_overrides": 96,
+    "terminal_goal_projections": 655,
+    "minimum_final_tcp_height_above_measured_goal_m": 0.12451968714594841
+  },
+  "combination_groups": {
+    "0": {
+      "uid": "layout_pilot/background_0_a0_b0",
+      "count": 3,
+      "successes": 3
+    },
+    "1": {
+      "uid": "layout_pilot/background_0_a0_b1",
+      "count": 3,
+      "successes": 3
+    },
+    "2": {
+      "uid": "layout_pilot/background_0_a1_b0",
+      "count": 3,
+      "successes": 3
+    },
+    "3": {
+      "uid": "layout_pilot/background_0_a1_b1",
+      "count": 3,
+      "successes": 3
+    },
+    "4": {
+      "uid": "layout_pilot/background_1_a0_b0",
+      "count": 3,
+      "successes": 3
+    },
+    "5": {
+      "uid": "layout_pilot/background_1_a0_b1",
+      "count": 3,
+      "successes": 3
+    },
+    "6": {
+      "uid": "layout_pilot/background_1_a1_b0",
+      "count": 3,
+      "successes": 3
+    },
+    "7": {
+      "uid": "layout_pilot/background_1_a1_b1",
+      "count": 3,
+      "successes": 3
+    },
+    "8": {
+      "uid": "layout_pilot/background_2_a0_b0",
+      "count": 3,
+      "successes": 3
+    },
+    "9": {
+      "uid": "layout_pilot/background_2_a0_b1",
+      "count": 3,
+      "successes": 3
+    },
+    "10": {
+      "uid": "layout_pilot/background_2_a1_b0",
+      "count": 3,
+      "successes": 3
+    },
+    "11": {
+      "uid": "layout_pilot/background_2_a1_b1",
+      "count": 3,
+      "successes": 3
+    },
+    "12": {
+      "uid": "layout_pilot/background_3_a0_b0",
+      "count": 3,
+      "successes": 3
+    },
+    "13": {
+      "uid": "layout_pilot/background_3_a0_b1",
+      "count": 3,
+      "successes": 3
+    },
+    "14": {
+      "uid": "layout_pilot/background_3_a1_b0",
+      "count": 3,
+      "successes": 2
+    },
+    "15": {
+      "uid": "layout_pilot/background_3_a1_b1",
+      "count": 3,
+      "successes": 2
+    }
+  },
+  "first_frozen_test": {
+    "successes": 2,
+    "count": 20,
+    "subsequently_used_for_debugging": true
+  },
+  "second_frozen_test": {
+    "successes": 19,
+    "count": 40,
+    "subsequently_used_for_debugging": true
+  },
+  "combination_scope": {
+    "count": 16,
+    "existing_expert_checks": 9,
+    "remaining_expert_checks": 7,
+    "new_training_data": false,
+    "note": "Already collected before the user took over data generation. Never used for model fitting or policy-performance selection; input/action ambiguity was audited earlier. Same4backgrounds with newA/Bcombinations, not a new-background benchmark."
+  },
+  "remaining_independent_background_test": "None among currently qualified uploaded packages; requires new held-out layouts or a specified external benchmark",
+  "actual_algorithm": {
+    "diffusion": true,
+    "EMA": true,
+    "DDPM_steps": 100,
+    "H": 2,
+    "K": 16,
+    "A": 8,
+    "control_dt_s": 0.25,
+    "actions": 40,
+    "neural_encoder": "goal and robot-state MLPs; no learned PointNet feature",
+    "goal_recipe": "green_cube_normals_depth_silhouette_initial_memory_v2",
+    "monotonic_stage_memory": true,
+    "valid_action_projection": true,
+    "terminal_goal_constraints": true,
+    "release_guard": {
+      "stable_intervals": 2,
+      "post_open_hold_steps": 2,
+      "xy_tolerance_m": 0.006,
+      "z_tolerance_m": 0.006,
+      "command_tolerance_m": 0.001,
+      "motion_tolerance_m": 0.0025,
+      "max_descent_per_step_m": 0.05,
+      "closed_target_m": 0.016,
+      "open_target_m": 0.04,
+      "control_dt_s": 0.25,
+      "recipe": "settled_nominal_pose_before_learned_release_v1",
+      "code_sha256": "1e98ec684fff95ee2c5b1842289f6e743c174851799ca0948281b7c5c4040b59"
+    },
+    "controller_filter": {
+      "joint_tau_s": 0.04,
+      "gripper_tau_s": 0.04,
+      "physics_dt_s": 0.008333333333333333,
+      "code_sha256": "46c674a6b6cd8d0724070bbe0dd5a026849a9505486392e126effeba0cf1b993",
+      "semantics": "same desired Cartesian targets and static drive gains; exponential reference convergence each physics tick; original reset unchanged"
+    },
+    "transport_clearance_guard": {
+      "hover_offset_m": 0.2,
+      "height_tolerance_m": 0.03,
+      "xy_tolerance_m": 0.006,
+      "max_horizontal_step_m": 0.08,
+      "max_rise_step_m": 0.1,
+      "max_descent_step_m": 0.08,
+      "recipe": "observed_goal_height_before_learned_horizontal_transport_v1",
+      "code_sha256": "3fdeb8a28f1befca4aff017ba10c7d6564c32e106972629cb3a5add13a63d965"
+    }
+  },
+  "public_SOTA_claim": false
+}

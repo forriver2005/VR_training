@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Run ten fixed-seed Isaac Sim closed-loop trials for the RGB overfit checkpoint."""
 from __future__ import annotations
+from repro_paths import learning_python, isaac_python
 import argparse
 import json
 import os
@@ -35,8 +36,8 @@ def main():
     p.add_argument('--usd',type=Path,default=ROOT/'data/isaacsim_trajectorysuccessful2_fr3v2_friction12_20260927/configured_scene.usda')
     p.add_argument('--urdf',type=Path,default=ROOT/'assets/fr3_gripper/fr3_panda_gripper.urdf')
     p.add_argument('--output',type=Path,required=True)
-    p.add_argument('--isaac-python',default='/home/houshengyuan/env_isaacsim60/bin/python')
-    p.add_argument('--lerobot-python',default='/home/houshengyuan/anaconda3/envs/lerobot/bin/python')
+    p.add_argument('--isaac-python',default=isaac_python())
+    p.add_argument('--lerobot-python',default=learning_python())
     p.add_argument('--server-device',default='cuda:0')
     p.add_argument('--server-gpu',default='1')
     p.add_argument('--sim-gpu',default='0')

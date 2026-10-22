@@ -1,0 +1,11 @@
+{
+  "python": "3.10.20",
+  "packages": {
+    "torch": "2.10.0",
+    "numpy": "2.2.6",
+    "lerobot": "0.4.4",
+    "diffusers": "0.35.2",
+    "safetensors": "0.8.0",
+    "transformers": null
+  }
+}

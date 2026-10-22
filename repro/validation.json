@@ -1,0 +1,33 @@
+{
+  "stage": "portable worktree verification",
+  "unit_tests": 38,
+  "unit_tests_passed": true,
+  "smoke_successes": 3,
+  "smoke_count": 3,
+  "source_workspace_changed": false,
+  "learning_environment": "Original pinned environment; fresh install verification pending",
+  "simulation_environment": "Existing Isaac Sim6.0.0.0 installation; no different physical device tested",
+  "smoke": [
+    {
+      "index": 0,
+      "seed": 0,
+      "success": true,
+      "final_xy_error_m": 0.0002978557604365051,
+      "ik_failures": 0
+    },
+    {
+      "index": 6,
+      "seed": 0,
+      "success": true,
+      "final_xy_error_m": 0.0006382447318173945,
+      "ik_failures": 0
+    },
+    {
+      "index": 23,
+      "seed": 0,
+      "success": true,
+      "final_xy_error_m": 0.0007976969936862588,
+      "ik_failures": 0
+    }
+  ]
+}

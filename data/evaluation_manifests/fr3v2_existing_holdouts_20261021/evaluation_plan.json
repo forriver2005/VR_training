@@ -1,0 +1,43 @@
+{
+  "used_layouts": [
+    "v2_all_20261015_201918_02/episode_000067",
+    "v2_all_20261016_172350_03/episode_000067",
+    "v2_all_20261018_193416_02.collection_retry1/episode_000042",
+    "v2_all_20261018_193416_03.collection_retry1/episode_000068",
+    "v2_all_20261018_193416_01/episode_000000",
+    "v2_all_20261016_172350_06/episode_000000"
+  ],
+  "fresh_layouts": [
+    "v2_all_20261014_084417_02/episode_000000",
+    "v2_all_20261014_084417_04/episode_000006"
+  ],
+  "excluded": [],
+  "duplicate_rule": "cube positions within2mm AND obstacle positions within2mm/rotations within0.5degree; ignores folder/sceneID/control-rate differences",
+  "control_dt_s": 0.25,
+  "physics_steps_per_frame": 30,
+  "actions": 40,
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+  ],
+  "training_data_unchanged": true,
+  "original_test_status": "first frozen test2/20; now used only for regression/debug, not advertised as a fresh independent test"
+}

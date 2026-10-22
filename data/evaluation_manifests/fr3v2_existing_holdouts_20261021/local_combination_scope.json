@@ -1,0 +1,7 @@
+{
+  "count": 16,
+  "existing_expert_checks": 9,
+  "remaining_expert_checks": 7,
+  "new_training_data": false,
+  "note": "Already collected before the user took over data generation. Never used for model fitting or policy-performance selection; input/action ambiguity was audited earlier. Same4backgrounds with newA/Bcombinations, not a new-background benchmark."
+}

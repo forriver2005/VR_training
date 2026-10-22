@@ -1,0 +1,93 @@
+{
+  "created_at_utc": "2026-10-21T04:22:47.519390+00:00",
+  "status": "candidate lists prepared; new training/online adapters and local expert replay still required",
+  "paths_relative_to": "DemoGrasp repository root; replay_report relative to package_root",
+  "audit_sources": {
+    "reports/data_delivery_audit_20261021/details.json": "07bdf3bca51b157af724f61e83e8635f57f257aeaabc7a807a46b0d318e5d65a",
+    "reports/data_delivery_audit_20261021/metadata.json": "cee9981540361895654ff4d325fe9504263f4355fc33deaefcfadf9c32e430fa",
+    "reports/data_delivery_audit_20261021/pointcloud_spotcheck.json": "6ecaecb457e295a0c56039d30867c248d5a5108adfe826ba109815ae3302c279"
+  },
+  "counts": {
+    "train_4hz": 398,
+    "validation_4hz": 100,
+    "test_4hz": 84,
+    "reserve_8hz": 194,
+    "excluded": 124,
+    "overfit_4hz": 1
+  },
+  "groups": {
+    "train_4hz": {
+      "v2_all_20261015_201918_02": 100,
+      "v2_all_20261016_172350_03": 99,
+      "v2_all_20261018_193416_02.collection_retry1": 100,
+      "v2_all_20261018_193416_03.collection_retry1": 99
+    },
+    "validation_4hz": {
+      "v2_all_20261018_193416_01": 100
+    },
+    "test_4hz": {
+      "v2_all_20261016_172350_06": 84
+    },
+    "reserve_8hz": {
+      "v2_all_20261014_084417_02": 100,
+      "v2_all_20261014_084417_04": 94
+    },
+    "excluded": {
+      "v2_all_20261014_084417_04": 6,
+      "v2_all_20261016_172350_03": 1,
+      "v2_all_20261016_172350_06": 16,
+      "v2_all_20261017_173223_01": 100,
+      "v2_all_20261018_193416_03.collection_retry1": 1
+    },
+    "overfit_4hz": {
+      "v2_all_20261018_193416_03.collection_retry1": 1
+    }
+  },
+  "source_files_unchanged": true,
+  "source_npz_sha256": "from full 2026-10-21 audit; loader must verify before use",
+  "pointcloud_scope": "all-success geometric depth provenance; FPS equality sampled at 54 frames, not exhaustive",
+  "training_protocol": {
+    "H": 2,
+    "K": 16,
+    "A": 8,
+    "control_dt_s": 0.25,
+    "physics_dt_s": 0.008333333333333333,
+    "physics_steps_per_frame": 30,
+    "reset_settle_steps": 240,
+    "frames": 40,
+    "history_offsets": [
+      -1,
+      0
+    ],
+    "action_offsets": [
+      -1,
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "executed_prediction_slice": [
+      1,
+      9
+    ],
+    "point_cloud_source": "wrist_depth",
+    "required_auxiliary_inputs": [
+      "history_valid",
+      "elapsed_same_target_s"
+    ],
+    "state_action_normalization_status": "must be defined with new task bounds; legacy bounds invalid"
+  },
+  "note": "overfit_4hz is an intentional subset of train_4hz; reserve_8hz is valid data for a separate protocol, not a quality rejection",
+  "split_rationale": "Freeze 4/1/1 scenes before fitting; include the elevated-start scene 20261018_193416_03 in training so it is not the only height regime appearing exclusively in test. No policy test scores used to choose the split; validation/test each contain only one scene."
+}

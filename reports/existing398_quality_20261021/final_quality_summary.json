@@ -1,0 +1,261 @@
+{
+  "checkpoint": "/home/houshengyuan/DexResearch/DemoGrasp/lerobot_policy/outputs/existing398_20261021/height_aware_policy_n4",
+  "status": "complete regression; no public SOTA claim",
+  "training_episodes": 398,
+  "training_layouts": 4,
+  "new_training_demonstrations": 0,
+  "complete_regression": {
+    "count": 138,
+    "successes": 138,
+    "mean_final_xy_mm": 1.0133341885997704,
+    "max_final_xy_mm": 4.715061746537685,
+    "max_stable_xy_mm": 4.715092945843935,
+    "max_height_error_mm": 0.005260109901428223,
+    "max_drift_mm": 0.012073913239873946,
+    "max_speed_mm_s": 5.2239663589797365,
+    "ik_failures": 0,
+    "workspace_clips": 0,
+    "forbidden_contact_trials": 0,
+    "release_guard_overrides": 371,
+    "terminal_goal_projections": 1966,
+    "minimum_final_tcp_height_above_measured_goal_m": 0.12379186227917671
+  },
+  "known_layout_regression": {
+    "count": 90,
+    "successes": 90,
+    "mean_final_xy_mm": 1.1810942056601763,
+    "max_final_xy_mm": 4.715061746537685,
+    "max_stable_xy_mm": 4.715092945843935,
+    "max_height_error_mm": 0.004019588232040405,
+    "max_drift_mm": 0.012073913239873946,
+    "max_speed_mm_s": 5.2239663589797365,
+    "ik_failures": 0,
+    "workspace_clips": 0,
+    "forbidden_contact_trials": 0,
+    "release_guard_overrides": 280,
+    "terminal_goal_projections": 1315,
+    "minimum_final_tcp_height_above_measured_goal_m": 0.12379186227917671
+  },
+  "maximum_goal_position_error_mm_diagnostic_only": 4.345082870928569,
+  "local_combination_regression": {
+    "count": 48,
+    "successes": 48,
+    "mean_final_xy_mm": 0.6987841566115094,
+    "max_final_xy_mm": 1.105904346331954,
+    "max_stable_xy_mm": 1.1067547602578998,
+    "max_height_error_mm": 0.005260109901428223,
+    "max_drift_mm": 0.009521812899038196,
+    "max_speed_mm_s": 3.9808264597138225,
+    "ik_failures": 0,
+    "workspace_clips": 0,
+    "forbidden_contact_trials": 0,
+    "release_guard_overrides": 91,
+    "terminal_goal_projections": 651,
+    "minimum_final_tcp_height_above_measured_goal_m": 0.12466688081622124
+  },
+  "groups": {
+    "0": {
+      "count": 5,
+      "successes": 5
+    },
+    "1": {
+      "count": 5,
+      "successes": 5
+    },
+    "2": {
+      "count": 5,
+      "successes": 5
+    },
+    "3": {
+      "count": 5,
+      "successes": 5
+    },
+    "4": {
+      "count": 10,
+      "successes": 10
+    },
+    "5": {
+      "count": 20,
+      "successes": 20
+    },
+    "6": {
+      "count": 20,
+      "successes": 20
+    },
+    "7": {
+      "count": 20,
+      "successes": 20
+    },
+    "8": {
+      "count": 3,
+      "successes": 3
+    },
+    "9": {
+      "count": 3,
+      "successes": 3
+    },
+    "10": {
+      "count": 3,
+      "successes": 3
+    },
+    "11": {
+      "count": 3,
+      "successes": 3
+    },
+    "12": {
+      "count": 3,
+      "successes": 3
+    },
+    "13": {
+      "count": 3,
+      "successes": 3
+    },
+    "14": {
+      "count": 3,
+      "successes": 3
+    },
+    "15": {
+      "count": 3,
+      "successes": 3
+    },
+    "16": {
+      "count": 3,
+      "successes": 3
+    },
+    "17": {
+      "count": 3,
+      "successes": 3
+    },
+    "18": {
+      "count": 3,
+      "successes": 3
+    },
+    "19": {
+      "count": 3,
+      "successes": 3
+    },
+    "20": {
+      "count": 3,
+      "successes": 3
+    },
+    "21": {
+      "count": 3,
+      "successes": 3
+    },
+    "22": {
+      "count": 3,
+      "successes": 3
+    },
+    "23": {
+      "count": 3,
+      "successes": 3
+    }
+  },
+  "first_frozen_test": {
+    "successes": 2,
+    "count": 20,
+    "subsequently_used_for_debugging": true
+  },
+  "second_frozen_test": {
+    "successes": 19,
+    "count": 40,
+    "subsequently_used_for_debugging": true
+  },
+  "previous_single_sample": {
+    "known_successes": 90,
+    "known_count": 90,
+    "local_successes": 46,
+    "local_count": 48
+  },
+  "independent_backgrounds_remaining": 0,
+  "public_SOTA_claim": false,
+  "policy_latency": {
+    "checkpoint": "/home/houshengyuan/DexResearch/DemoGrasp/lerobot_policy/outputs/existing398_20261021/height_aware_policy_n4",
+    "rollout": "/home/houshengyuan/DexResearch/DemoGrasp/lerobot_policy/outputs/existing398_20261021/ensemble_full_remaining/index_005_seed_00/simulation/rollout.npz",
+    "device": "NVIDIA RTX 6000 Ada Generation",
+    "action_samples": 4,
+    "cuda_synchronized": true,
+    "warmup_episodes": 1,
+    "repetitions": 5,
+    "model_replanning": {
+      "count": 25,
+      "mean_ms": 314.14614140987396,
+      "p50_ms": 310.70192717015743,
+      "p95_ms": 329.08056396991014,
+      "max_ms": 346.0308164358139
+    },
+    "queued_action": {
+      "count": 175,
+      "mean_ms": 1.0719335238848413,
+      "p50_ms": 0.6392234936356544,
+      "p95_ms": 2.5850382633507247,
+      "max_ms": 3.114595077931881
+    },
+    "all_calls": {
+      "count": 200,
+      "mean_ms": 40.20620950963348,
+      "p50_ms": 0.911373645067215,
+      "p95_ms": 311.36609013192356,
+      "max_ms": 346.0308164358139
+    },
+    "reference_action_max_absolute_difference": 0.0,
+    "scope": "Policy only; excludes camera capture, RGB-D geometry, IPC, IK and physics. Synchronous simulator pauses physics while waiting; simulated4Hz is not guaranteed wall-clock4Hz."
+  },
+  "actual_algorithm": {
+    "encoder": "proprioceptive",
+    "visual_input": "measured fixed RGB-D goal geometry",
+    "H": 2,
+    "K": 16,
+    "A": 8,
+    "action_samples": 4,
+    "DDPM_steps": 100,
+    "EMA": true,
+    "selected_training_step": 20000,
+    "total_training_steps": 40000,
+    "control_dt_s": 0.25,
+    "action_count": 40,
+    "goal_memory": {
+      "recipe": "green_cube_normals_depth_silhouette_initial_memory_v2",
+      "code_sha256": "e90f78278862dff4876aead8dd79c2abf90cc56fd86b19b34c27a1bf69ab768a",
+      "source": "fixed RGB-D surface normals and depth-supported silhouettes; first valid measurement; known axis-aligned green6cm cube"
+    },
+    "monotonic_goal_gate": true,
+    "release_guard": {
+      "stable_intervals": 2,
+      "post_open_hold_steps": 2,
+      "xy_tolerance_m": 0.006,
+      "z_tolerance_m": 0.006,
+      "command_tolerance_m": 0.001,
+      "motion_tolerance_m": 0.0025,
+      "max_descent_per_step_m": 0.05,
+      "closed_target_m": 0.016,
+      "open_target_m": 0.04,
+      "control_dt_s": 0.25,
+      "recipe": "settled_nominal_pose_before_learned_release_v1",
+      "code_sha256": "1e98ec684fff95ee2c5b1842289f6e743c174851799ca0948281b7c5c4040b59"
+    },
+    "controller_filter": {
+      "joint_tau_s": 0.04,
+      "gripper_tau_s": 0.04,
+      "physics_dt_s": 0.008333333333333333,
+      "code_sha256": "46c674a6b6cd8d0724070bbe0dd5a026849a9505486392e126effeba0cf1b993",
+      "semantics": "same desired Cartesian targets and static drive gains; exponential reference convergence each physics tick; original reset unchanged"
+    },
+    "transport_clearance_guard": {
+      "hover_offset_m": 0.2,
+      "height_tolerance_m": 0.03,
+      "xy_tolerance_m": 0.006,
+      "max_horizontal_step_m": 0.08,
+      "max_rise_step_m": 0.1,
+      "max_descent_step_m": 0.08,
+      "recipe": "observed_goal_height_before_learned_horizontal_transport_v1",
+      "code_sha256": "3fdeb8a28f1befca4aff017ba10c7d6564c32e106972629cb3a5add13a63d965"
+    }
+  },
+  "limits": [
+    "All 24 configurations now have development feedback; repeated seeds are not new scenes.",
+    "16 combinations share four backgrounds; no broad unseen-background claim.",
+    "Known green 6cm axis-aligned target and task-specific action/control constraints.",
+    "No simulator object/contact truth is used as policy or guard input."
+  ]
+}

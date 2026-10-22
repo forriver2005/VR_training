@@ -1,1 +1,9 @@
 lerobot_policy/exports/stack_cube_act_68pct_repro_20260801.tar.gz filter=lfs diff=lfs merge=lfs -text
+
+# Preserve byte-exact sources referenced by checkpoint/runtime SHA256 contracts.
+lerobot_policy/*.py -text
+lerobot_policy/isaacsim_runtime/*.py -text -whitespace
+repro/checkpoint/** -text
+reports/existing398_quality_20261021/frozen_source/** -text -whitespace
+reports/existing398_quality_20261021/frozen_final_source/** -text -whitespace
+reports/existing398_quality_20261021/frozen_height_aware_source/** -text -whitespace

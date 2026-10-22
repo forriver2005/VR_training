@@ -1,0 +1,34 @@
+{
+  "training_count": 20,
+  "training_scenes": 4,
+  "training_list_sha256": "3bd68ab5857ff9ddb0af465aaa77b4c3cac4527e917cfe5e48b4f434f8930cc4",
+  "selection": "centroid-nearest start then farthest action-path coverage over frames20:31, five per training scene",
+  "representatives": [
+    {
+      "index": 0,
+      "uid": "v2_all_20261015_201918_02/episode_000067",
+      "role": "training"
+    },
+    {
+      "index": 1,
+      "uid": "v2_all_20261016_172350_03/episode_000067",
+      "role": "training"
+    },
+    {
+      "index": 2,
+      "uid": "v2_all_20261018_193416_02.collection_retry1/episode_000042",
+      "role": "training"
+    },
+    {
+      "index": 3,
+      "uid": "v2_all_20261018_193416_03.collection_retry1/episode_000068",
+      "role": "training"
+    },
+    {
+      "index": 4,
+      "uid": "v2_all_20261018_193416_01/episode_000000",
+      "role": "validation"
+    }
+  ],
+  "test_data_used": false
+}

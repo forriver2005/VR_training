@@ -1,0 +1,44 @@
+[
+  {
+    "uid": "v2_all_20261015_201918_02/episode_000067",
+    "valid_goal_frames": 40,
+    "goal_error_mean_mm": 0.16392892196406855,
+    "goal_error_max_mm": 1.7945134126247808,
+    "missing_A_frames": [],
+    "goal_frame0_error_mm": 0.0007214303282455452
+  },
+  {
+    "uid": "v2_all_20261016_172350_03/episode_000067",
+    "valid_goal_frames": 40,
+    "goal_error_mean_mm": 0.007960831839733045,
+    "goal_error_max_mm": 0.28063543986168227,
+    "missing_A_frames": [],
+    "goal_frame0_error_mm": 0.0015313205035607164
+  },
+  {
+    "uid": "v2_all_20261018_193416_02.collection_retry1/episode_000042",
+    "valid_goal_frames": 40,
+    "goal_error_mean_mm": 1.4496639559948432,
+    "goal_error_max_mm": 11.993775409264517,
+    "missing_A_frames": [
+      0
+    ],
+    "goal_frame0_error_mm": 0.0009126483286733297
+  },
+  {
+    "uid": "v2_all_20261018_193416_03.collection_retry1/episode_000068",
+    "valid_goal_frames": 40,
+    "goal_error_mean_mm": 0.06692622184354396,
+    "goal_error_max_mm": 2.573899956784253,
+    "missing_A_frames": [],
+    "goal_frame0_error_mm": 0.0007515936691166826
+  },
+  {
+    "uid": "v2_all_20261018_193416_01/episode_000000",
+    "valid_goal_frames": 40,
+    "goal_error_mean_mm": 1.023276885019293,
+    "goal_error_max_mm": 5.744656437444781,
+    "missing_A_frames": [],
+    "goal_frame0_error_mm": 0.4913124300858921
+  }
+]

@@ -107,7 +107,7 @@
     "lerobot_policy/train_diffusion_overfit.py": "94fbb6ff44726709d12f4002dc0ac2d09f6fa9606f35be8c4efa600aa0fcb122",
     "lerobot_policy/transport_clearance_guard.py": "3fdeb8a28f1befca4aff017ba10c7d6564c32e106972629cb3a5add13a63d965",
     "lerobot_policy/validate_final_height_policy.py": "9c6c286229083adf1b012d407f9418a4cab40f1dda1fb035cca28f21f705e48f",
-    "repro/README.md": "f5015a20ac1539ac93d8ad09d4cbf23d65926382a293c5875605c8f0d9b87e82",
+    "repro/README.md": "3cac568634a4c3d0797a1a6799bd5d78a67575b7936aa120f90f7707ab231592",
     "repro/artifacts.json": "ee7b82297fd554554a9630c4dbd92cdbd94ea6134c456a9487d102ac720a2349",
     "repro/build_artifacts.py": "5ea83474d94718d3190e87ee465477e64293f82554080fadc8175c078804c4b3",
     "repro/checkpoint/config.json": "970ace7b433ba8bee039cf1c9f34ac7b7cf14ea17b00a0bb2dcc8dc630862777",
@@ -119,6 +119,10 @@
     "repro/checkpoint/run_config.json": "57d6c380d386ad33bed903d48e233cb484081c18482009e4d72e53fde749e3f4",
     "repro/checkpoint/terminal_action_contract_audit.json": "2de1ba3e065747548060b1db164921710de29d337000a7331d9e269f397c0cda",
     "repro/checkpoint/transport_height_contract_audit.json": "3e20fbe22550751b5057ffb7b7cef72fdae2daf5d1b21ef1e4b40339d8c09db5",
+    "repro/evidence/fresh_environment_training_smoke.txt": "8477bd42fe7d3fd991fcc93b48566f0d74b60392ad96e72dbb0fa3d110a10d98",
+    "repro/evidence/fresh_environment_unit_tests.txt": "42ef0b98fecaf435b5d3c7047e60c46353e566ce1421a2cdf657315774e75a54",
+    "repro/evidence/fresh_inference.json": "e2af80f2da516dbd812a6f1ec83c6c929c1b90071197c023a0564e37d73d58e9",
+    "repro/evidence/fresh_regression_summary.json": "5ffa92468aa11c781d8966148fcce31fec643800597f51f2f574062a916d9439",
     "repro/evidence/index_000_seed_00.json": "a03a26cc31c8db952c9c4c50817fc8e902f0401aab3f5a087f55ac3ef2b94311",
     "repro/evidence/index_000_seed_01.json": "4237923cb2dfea9c161fd8adf5a46ca405a2065e9f0a172e0a972b4ed159b9a7",
     "repro/evidence/index_000_seed_02.json": "983a3801e111f9fdedb836c949786f47558f14facd57a8dd7ba2263822c07fcf",
@@ -266,6 +270,6 @@
     "repro/regression_tasks.json": "e45242eba8970e05826aad4062cbc7ef46b3d7f27785d1fdd7c1d59ebf265266",
     "repro/run.py": "5b7c4676cd3099741ae2bf2149b1b84000943cff8fc33e07a55ca06124cb3f9c",
     "repro/sim-environment.lock.txt": "c7802b95194456009abd28cf09b5a837eea82a2014e00829a2e092e21771e533",
-    "repro/validation.json": "52c9bdd366a13b48b7aa190e10cef2662e8a7449bf70b688a235452ee567ab25"
+    "repro/validation.json": "3e852d5a2a9c4bd5222d88d71ea710a8414e1b584ab4fb70db4100b6b4bddd06"
   }
 }

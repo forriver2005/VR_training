@@ -1,12 +1,12 @@
 {
-  "stage": "portable worktree verification",
+  "stage": "remote clone + clean learning environment verified",
   "unit_tests": 38,
   "unit_tests_passed": true,
   "smoke_successes": 3,
   "smoke_count": 3,
   "source_workspace_changed": false,
-  "learning_environment": "Original pinned environment; fresh install verification pending",
-  "simulation_environment": "Existing Isaac Sim6.0.0.0 installation; no different physical device tested",
+  "learning_environment": "New empty Python3.10 venv installed from pinned packages; pip check passed",
+  "simulation_environment": "Existing same-host Isaac Sim6.0.0.0; pip check passed; all167 locked releases found on PyPI/NVIDIA; no second physical device claimed",
   "smoke": [
     {
       "index": 0,
@@ -39,5 +39,33 @@
   },
   "derivation_chain_verified": true,
   "release_assets": 20,
-  "release_asset_sha256_verified_by_github": true
+  "release_asset_sha256_verified_by_github": true,
+  "fresh_environment_unit_tests": 38,
+  "fresh_clone_synthetic_tests": 27,
+  "fresh_clone_regression": {
+    "count": 138,
+    "successes": 138,
+    "runtime_errors": 0,
+    "mean_final_xy_mm": 1.0053806233201243,
+    "max_final_xy_mm": 3.3870304469019175,
+    "max_stable_xy_mm": 3.38828656822443,
+    "ik_failures": 0,
+    "forbidden_contact_trials": 0
+  },
+  "fresh_clone_tested_commit": "7a4d507ad484365642fe96543ea6850d689cc9bd",
+  "frozen_action_reproduction_max_abs_difference": 0,
+  "GPUs_used_for_regression": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "additional_training_smoke_GPU": 6,
+  "original_hsy_worktree_unchanged_by_packaging": true,
+  "limitations": [
+    "Regression configurations have development feedback.",
+    "Same hardware, separate clone and fresh learning environment; not an independent second-machine test.",
+    "Full40k retraining was not repeated during packaging; all398 inputs and2 optimizer steps/checkpoint saves/derivation were exercised."
+  ]
 }

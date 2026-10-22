@@ -1,0 +1,274 @@
+{
+  "checkpoint": "/home/houshengyuan/DexResearch/VR_training-clean-check/repro/checkpoint",
+  "rollout": "/home/houshengyuan/DexResearch/VR_training-clean-check/lerobot_policy/outputs/existing398_20261021/ensemble_full_remaining/index_005_seed_00/simulation/rollout.npz",
+  "device": "NVIDIA RTX 6000 Ada Generation",
+  "action_samples": 4,
+  "cuda_synchronized": true,
+  "warmup_episodes": 1,
+  "repetitions": 1,
+  "model_replanning": {
+    "count": 5,
+    "mean_ms": 300.9447628632188,
+    "p50_ms": 298.70099388062954,
+    "p95_ms": 310.0803706794977,
+    "max_ms": 311.28606386482716
+  },
+  "queued_action": {
+    "count": 35,
+    "mean_ms": 0.41142148630959646,
+    "p50_ms": 0.3981348127126694,
+    "p95_ms": 0.5065868608653545,
+    "max_ms": 0.5589323118329048
+  },
+  "all_calls": {
+    "count": 40,
+    "mean_ms": 37.978089158423245,
+    "p50_ms": 0.4019089974462986,
+    "p95_ms": 299.02882408350706,
+    "max_ms": 311.28606386482716
+  },
+  "reference_action_max_absolute_difference": 0.0,
+  "scope": "Policy only; excludes camera capture, RGB-D geometry, IPC, IK and physics. Synchronous simulator pauses physics while waiting; simulated4Hz is not guaranteed wall-clock4Hz.",
+  "timings": [
+    {
+      "repeat": 0,
+      "frame": 0,
+      "duration_s": 0.29724918585270643,
+      "replanned": true
+    },
+    {
+      "repeat": 0,
+      "frame": 1,
+      "duration_s": 0.0004959655925631523,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 2,
+      "duration_s": 0.0004240386188030243,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 3,
+      "duration_s": 0.0003900546580553055,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 4,
+      "duration_s": 0.000376102514564991,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 5,
+      "duration_s": 0.00039813481271266937,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 6,
+      "duration_s": 0.0003748387098312378,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 7,
+      "duration_s": 0.00036463886499404907,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 8,
+      "duration_s": 0.2922299727797508,
+      "replanned": true
+    },
+    {
+      "repeat": 0,
+      "frame": 9,
+      "duration_s": 0.000469832681119442,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 10,
+      "duration_s": 0.0003991583362221718,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 11,
+      "duration_s": 0.00038043223321437836,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 12,
+      "duration_s": 0.00038056541234254837,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 13,
+      "duration_s": 0.0003984980285167694,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 14,
+      "duration_s": 0.00037484709173440933,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 15,
+      "duration_s": 0.000369916670024395,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 16,
+      "duration_s": 0.29870099388062954,
+      "replanned": true
+    },
+    {
+      "repeat": 0,
+      "frame": 17,
+      "duration_s": 0.0005589323118329048,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 18,
+      "duration_s": 0.00041649024933576584,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 19,
+      "duration_s": 0.00039427634328603745,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 20,
+      "duration_s": 0.00045160669833421707,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 21,
+      "duration_s": 0.0004154117777943611,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 22,
+      "duration_s": 0.00042889732867479324,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 23,
+      "duration_s": 0.00038347672671079636,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 24,
+      "duration_s": 0.30525759793817997,
+      "replanned": true
+    },
+    {
+      "repeat": 0,
+      "frame": 25,
+      "duration_s": 0.0005010254681110382,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 26,
+      "duration_s": 0.00040853768587112427,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 27,
+      "duration_s": 0.0003960961475968361,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 28,
+      "duration_s": 0.0004163328558206558,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 29,
+      "duration_s": 0.0004046596586704254,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 30,
+      "duration_s": 0.0003807246685028076,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 31,
+      "duration_s": 0.0003785323351621628,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 32,
+      "duration_s": 0.31128606386482716,
+      "replanned": true
+    },
+    {
+      "repeat": 0,
+      "frame": 33,
+      "duration_s": 0.0005195634439587593,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 34,
+      "duration_s": 0.00041991937905550003,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 35,
+      "duration_s": 0.0004051448777318001,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 36,
+      "duration_s": 0.0003972873091697693,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 37,
+      "duration_s": 0.0003756983205676079,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 38,
+      "duration_s": 0.00036589428782463074,
+      "replanned": false
+    },
+    {
+      "repeat": 0,
+      "frame": 39,
+      "duration_s": 0.0003842199221253395,
+      "replanned": false
+    }
+  ]
+}

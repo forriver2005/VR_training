@@ -1,0 +1,4 @@
+{"episodes": 398, "windows": 15920, "parameters": 5496970}
+{"step": 1, "loss": 0.8911933898925781, "grad_norm": 20.197031021118164, "lr": 4.0000000000000003e-07, "elapsed_s": 0.7891356674954295, "diffusion_loss": 0.856166422367096, "phase_loss": 0.700539231300354}
+CHECKPOINT /home/houshengyuan/DexResearch/DemoGrasp-repro/repro-runs/fresh-env-training-smoke/checkpoints/000001
+CHECKPOINT /home/houshengyuan/DexResearch/DemoGrasp-repro/repro-runs/fresh-env-training-smoke/checkpoints/000002

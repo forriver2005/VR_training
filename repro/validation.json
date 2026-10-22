@@ -29,5 +29,15 @@
       "final_xy_error_m": 0.0007976969936862588,
       "ik_failures": 0
     }
-  ]
+  ],
+  "training_entry_verified": {
+    "episodes": 398,
+    "steps": 2,
+    "batch_size": 2,
+    "checkpoints_saved": true,
+    "quality_claim": false
+  },
+  "derivation_chain_verified": true,
+  "release_assets": 20,
+  "release_asset_sha256_verified_by_github": true
 }

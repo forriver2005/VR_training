@@ -68,7 +68,7 @@ def unpack(archive_path, files):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--sets', nargs='+', choices=['runtime', 'evaluation', 'training'],
+    parser.add_argument('--sets', nargs='+', choices=['runtime', 'evaluation', 'training', 'cache'],
                         default=['runtime', 'evaluation'])
     parser.add_argument('--local-source', type=Path, help='Use already downloaded archives')
     parser.add_argument('--verify-only', action='store_true')

@@ -17,6 +17,7 @@
 | 场景USD、贴图、URDF及相关资产 | GitHub Release的`runtime`资源组 |
 | 24个评测reset/输入与一个动作复现样本 | Release的`evaluation`资源组 |
 | 398条原始训练＋100条原始验证轨迹 | Release的`training`资源组，与evaluation中的重叠文件去重 |
+| 可选预处理缓存 | Release的`cache`资源组；原始深度重建的点云和v1目标特征，含源数据/代码校验和 |
 | 所有资源的文件级/压缩包级SHA256 | `repro/artifacts.json` |
 | 发行源码与权重SHA256 | `repro/source_manifest.json` |
 
@@ -45,10 +46,13 @@ cd VR_training
 
 两个Python环境必须分开：学习环境Python3.10，仿真环境Python3.12。
 如系统缺少相应Python/venv，请先安装，或用Conda创建对应版本的独立环境。
+学习环境的`evdev`依赖需要C编译器和Linux输入设备头文件；Ubuntu通常由`build-essential`、`linux-libc-dev`及对应Python开发头文件提供。
 
 ```bash
 python3.10 -m venv .venvs/learning
 .venvs/learning/bin/python -m pip install --upgrade pip
+.venvs/learning/bin/python -m pip install setuptools==80.9.0 wheel==0.45.1
+.venvs/learning/bin/python -m pip install --no-build-isolation evdev==1.9.3
 .venvs/learning/bin/python -m pip install -r repro/learning-environment.lock.txt
 
 python3.12 -m venv .venvs/isaacsim
@@ -59,6 +63,8 @@ python3.12 -m venv .venvs/isaacsim
 
 锁文件记录实际运行环境的完整包版本，而不只是顶层依赖。主要版本为PyTorch2.10.0、LeRobot0.4.4、Diffusers0.35.2；
 学习NumPy2.2.6；仿真NumPy2.3.1、IKPy3.4.2。原训练使用TF32，不启用AMP。
+先安装指定构建工具，再安装`evdev`，是干净环境验证中发现的必要步骤；默认隔离构建曾因找不到`genecodes_c.py`失败。
+这不修改策略或依赖版本，只固定该外设包的构建方式。
 Isaac Sim的安装和运行受NVIDIA软件条款约束；启动器按原流程设置`OMNI_KIT_ACCEPT_EULA=YES`。
 参阅[NVIDIA Python安装文档](https://docs.isaacsim.omniverse.nvidia.com/6.0.0/installation/install_python.html)。
 
@@ -117,7 +123,7 @@ python3 repro/fetch_artifacts.py --sets runtime evaluation
 先补充原始训练和验证数据；必须同时保留runtime/evaluation，因为存在文件共享。
 
 ```bash
-python3 repro/fetch_artifacts.py --sets runtime evaluation training
+python3 repro/fetch_artifacts.py --sets runtime evaluation training cache
 .venvs/learning/bin/python repro/run.py train \
   --output repro-runs/training --gpu 0
 ```
@@ -125,6 +131,7 @@ python3 repro/fetch_artifacts.py --sets runtime evaluation training
 默认准确对应原训练方案：398条/4布局、40k步、batch32、seed42、AdamW1e-4、500步warmup＋余弦下降、
 EMA power0.75、H2/K16/A8、DDPM100、sample预测、位置损失权重6、阶段BCE权重0.05；每10k保存。
 窗口不跨episode，边界重复补齐且参与损失，无数据增强。训练目标和观测的固定归一化写入checkpoint。
+`cache`不是新增训练数据，只省去确定性的深度反投影/FPS及目标特征预处理。不下载它也能训练，但首次处理398条轨迹会较慢。
 
 历史最佳选在20k EMA；它来自**计划总步数40k**的学习率调度。把`--steps`改成20k会改变调度，不能视为相同训练。
 训练时使用v1目标几何，最终推理切换v2；这里保留实际权重来源，不把尚未评估的v2重训称为已验证方案。
